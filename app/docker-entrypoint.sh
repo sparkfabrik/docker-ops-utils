@@ -1,24 +1,28 @@
 #!/bin/sh
 
-BASE=$(dirname $0)
-BASE_SCRIPT=$(basename $0)
+export BASE=$(dirname $0)
+export BASE_SCRIPT=$(basename $0)
+export DRY_RUN=0
+export TOPIC=
+export WD=
 
-DEBUG=${DEBUG:-0}
-DRY_RUN=0
+export DEBUG=${DEBUG:-0}
 
 show_usage() {
   cat <<EOM
 Usage: ${BASE_SCRIPT} <COMMAND> [SUBCOMMAND] [OPTIONS]
 
 COMMANDS
+  ash
 EOM
 
-for script in commands/*.sh; do
-  cmd=${script%".sh"}
-  cmd=${cmd#"commands/"}
-  cat <<EOM
+for topic in "${BASE}"/commands/*; do
+  cmd=${topic#"${BASE}"/commands/}
+  if [ -x "${topic}/main.sh" ]; then
+    cat <<EOM
   ${cmd}
 EOM
+  fi
 done
 
   cat <<EOM
@@ -47,10 +51,15 @@ if [ -z "${1}" ]; then
   exit 1
 fi
 
-if [ -x "commands/${1}.sh" ]; then
-  COMMAND="commands/${1}.sh"
+if [ "${1}" = "ash" ]; then
+  shift 1
+  exec ash "$@"
+elif [ -x "commands/${1}/main.sh" ]; then
+  CMD="commands/${1}/main.sh"
+  TOPIC="${1}"
+  WD="${BASE}/commands/${1}"
   shift
-  exec env BASE="${BASE}" BASE_SCRIPT="${BASE_SCRIPT}" DRY_RUN="${DRY_RUN}" "${COMMAND}" "$@"
+  exec "${CMD}" "$@"
 else
   show_usage
   exit 2
