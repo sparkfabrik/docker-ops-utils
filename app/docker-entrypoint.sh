@@ -1,6 +1,10 @@
 #!/bin/sh
 
 export BASE=$(dirname $0)
+
+# Source functions library.
+. ${BASE}/functions
+
 export BASE_SCRIPT=$(basename $0)
 export DRY_RUN=0
 export TOPIC=
@@ -54,8 +58,8 @@ fi
 if [ "${1}" = "ash" ]; then
   shift 1
   exec ash "$@"
-elif [ -x "commands/${1}/main.sh" ]; then
-  CMD="commands/${1}/main.sh"
+elif [ -x "${BASE}/commands/${1}/main.sh" ]; then
+  CMD="${BASE}/commands/${1}/main.sh"
   TOPIC="${1}"
   WD="${BASE}/commands/${1}"
   shift

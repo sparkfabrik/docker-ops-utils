@@ -1,0 +1,11 @@
+# -*-Shell-script-*-
+#
+# This file contains functions to be used by most or all
+# shell scripts in the /app directory.
+#
+
+debug() {
+  if [ -n "${1}" ] && [ ${DEBUG} -eq 1 ]; then
+    echo "${1}"
+  fi
+}

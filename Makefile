@@ -7,20 +7,21 @@ build:
 	docker build . --file Dockerfile --tag $(IMAGE_NAME):$(IMAGE_TAG)
 
 cli: build
+	@touch .env
 	docker run --rm -it \
-		-e AWS_ACCESS_KEY_ID \
-		-e AWS_SECRET_ACCESS_KEY \
-		-e AWS_DEFAULT_REGION \
+		--env-file .env \
 		$(IMAGE_NAME):$(IMAGE_TAG) ash -li
 
 cli-dev: build
+	@touch .env
 	docker run --rm -it \
-		-e AWS_ACCESS_KEY_ID \
-		-e AWS_SECRET_ACCESS_KEY \
-		-e AWS_DEFAULT_REGION \
+		--env-file .env \
 		-v ${PWD}/app:/app \
 		-w /app \
 		$(IMAGE_NAME):$(IMAGE_TAG) ash -li
 
-print-run:
-	@echo "docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION $(IMAGE_NAME):$(IMAGE_TAG) <COMMAND> [SUBCOMMAND] [OPTIONS]"
+cli-test:
+	docker-compose -f tests/docker-compose.yml run $(IMAGE_NAME) ash -li
+
+test:
+	@./tests/mysql-import-from-bucket.sh

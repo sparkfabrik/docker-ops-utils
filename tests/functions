@@ -1,0 +1,67 @@
+# -*-Shell-script-*-
+#
+# This file contains functions to be used by most or all
+# shell scripts in the /tests directory.
+#
+
+export COMPOSE_FILE="${BASE}/docker-compose.yml"
+
+export PASS_STR="\e[32mOK\e[39m"
+export FAIL_STR="\e[31mFAIL\e[39m"
+
+envdestroy() {
+  docker-compose -f "${COMPOSE_FILE}" down -v
+}
+
+envprepare() {
+  envdestroy
+
+  docker-compose -f "${COMPOSE_FILE}" build --pull
+  docker-compose -f "${COMPOSE_FILE}" up -d
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
+}
+
+query() {
+  if [ -z "${1}" ]; then
+    echo "Query error"
+    exit 99
+  fi
+
+  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic 'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME}' | tr -d "\r"
+}
+
+fail() {
+  INFO=""
+  if [ -n "${1}" ]; then
+    INFO="${1}"
+  fi
+
+  if [ -n "${2}" ]; then
+    INFO="${INFO} - ACTUAL: ${2}"
+  fi
+
+  if [ -n "${3}" ]; then
+    INFO="${INFO} - EXPECTED: ${3}"
+  fi
+
+  echo "${FAIL_STR} - ${INFO}"
+
+  exit 1
+}
+
+success() {
+  INFO=""
+  if [ -n "${1}" ]; then
+    INFO="${1}"
+  fi
+
+  if [ -n "${2}" ]; then
+    INFO="${INFO} - ACTUAL: ${2}"
+  fi
+
+  if [ -n "${3}" ]; then
+    INFO="${INFO} - EXPECTED: ${3}"
+  fi
+
+  echo "${PASS_STR} - ${INFO}"
+}
