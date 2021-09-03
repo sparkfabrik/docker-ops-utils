@@ -21,7 +21,23 @@ cli-dev: build
 		$(IMAGE_NAME):$(IMAGE_TAG) ash -li
 
 cli-test:
-	docker-compose -f tests/docker-compose.yml run $(IMAGE_NAME) ash -li
+	docker-compose -f tests/docker-compose.yml run \
+		-v ${PWD}/app:/app \
+		$(IMAGE_NAME) ash -li
 
 test:
 	@./tests/mysql-import-from-bucket.sh
+	@./tests/mysql-export-to-bucket.sh
+
+mysql-test-up:
+	@echo "\e[33mThis make target will reboot the test mysql service.\e[39m"
+	@echo "\e[33mRemember that this service will be destroyed and recreated each time.\e[39m"
+	@echo "\e[33mRemember also that this service will be destroyed if you run the tests.\e[39m"
+	docker-compose -f tests/docker-compose.yml rm -fsv mysql
+	docker-compose -f tests/docker-compose.yml up -d mysql
+
+mysql-test-seeded: mysql-test-up
+	docker-compose -f tests/docker-compose.yml run --rm \
+		--entrypoint ash \
+		-v ${PWD}/tests/minio/seeds:/seeds \
+		ops-utils -lic 'wait-for-it $${DB_HOST}:$${DB_PORT:-3306} -t 30 && if [ $$? -eq 0 ]; then mysql -h$${DB_HOST} -P$${DB_PORT:-3306} -u$${DB_USER} --password="$${DB_PASSWORD}" $${DB_NAME} < /seeds/dump.sql; echo -e "\e[32mOK: database succesfully seeded\e[39m"; else echo -e "\e[31mERROR: the DB server fails to start\e[39m"; exit 1; fi'

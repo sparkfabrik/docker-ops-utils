@@ -5,9 +5,22 @@
 #
 
 export COMPOSE_FILE="${BASE}/docker-compose.yml"
+export ENV_FILE="${BASE}/.env"
 
 export PASS_STR="\e[32mOK\e[39m"
 export FAIL_STR="\e[31mFAIL\e[39m"
+
+getenvvar() {
+  if [ -z "${1}" ]; then
+    echo "getenv error"
+    exit 99
+  fi
+
+  LINE=$(cat "${ENV_FILE}" | grep "${1}=")
+  if [ $? -eq 0 ]; then
+    echo ${LINE#${1}=}
+  fi
+}
 
 envdestroy() {
   docker-compose -f "${COMPOSE_FILE}" down -v
@@ -18,7 +31,21 @@ envprepare() {
 
   docker-compose -f "${COMPOSE_FILE}" build --pull
   docker-compose -f "${COMPOSE_FILE}" up -d
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
+}
+
+mysqlimport() {
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
+}
+
+mysqlimport_exported_db() {
+  DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
+
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    mysql export-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump-exported.sql.gz
+  query "CREATE DATABASE ${DB_NAME_EXP};"
+  docker-compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
+    mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump-exported.sql.gz
 }
 
 query() {
@@ -27,7 +54,18 @@ query() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic 'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME}' | tr -d "\r"
+  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
+    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME}' | tr -d "\r"
+}
+
+query_exported_db() {
+  if [ -z "${1}" ]; then
+    echo "Query error"
+    exit 99
+  fi
+
+  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
+    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME_EXP}' | tr -d "\r"
 }
 
 fail() {

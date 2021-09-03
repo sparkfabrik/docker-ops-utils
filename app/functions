@@ -9,3 +9,28 @@ debug() {
     echo "${1}"
   fi
 }
+
+rclone_aws() {
+  rclone \
+    --s3-region="${AWS_DEFAULT_REGION}" \
+    --s3-location-constraint="${AWS_DEFAULT_REGION}" \
+    --s3-env-auth \
+    ${RCLONE_ADD_PARAMS} $@
+}
+
+rclone_gcs() {
+  rclone \
+    ${RCLONE_ADD_PARAMS} $@
+}
+
+rclone_minio() {
+  rclone \
+    --s3-provider=Minio \
+    --s3-endpoint=${BUCKET_ENDPOINT} \
+    --s3-env-auth \
+    ${RCLONE_ADD_PARAMS} $@
+}
+
+remove_http_proto() {
+  echo "${1}" | sed 's|http[s]*://||g'
+}
