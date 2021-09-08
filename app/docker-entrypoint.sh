@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/bin/bash
+
+QUOTEDCMD=()
+for token in "$@"; do
+  QUOTEDCMD+=($(printf "%q" "$token"))
+done
+CMD="${QUOTEDCMD[*]}"
 
 export BASE=$(dirname $0)
 
@@ -17,7 +23,7 @@ show_usage() {
 Usage: ${BASE_SCRIPT} <COMMAND> [SUBCOMMAND] [OPTIONS]
 
 COMMANDS
-  ash
+  ash | sh
 EOM
 
 for topic in "${BASE}"/commands/*; do
@@ -55,9 +61,8 @@ if [ -z "${1}" ]; then
   exit 1
 fi
 
-if [ "${1}" = "ash" ]; then
-  shift 1
-  exec ash "$@"
+if [ "${1}" = "ash" ] || [ "${1}" = "sh" ]; then
+  eval ${CMD}
 elif [ -x "${BASE}/commands/${1}/main.sh" ]; then
   CMD="${BASE}/commands/${1}/main.sh"
   TOPIC="${1}"
