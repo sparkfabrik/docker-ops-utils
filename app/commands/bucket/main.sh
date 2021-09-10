@@ -10,7 +10,7 @@ export PROVIDER=${PROVIDER:-}
 export PROVIDER_LOWER=
 export BUCKET_SRC_ENDPOINT=${BUCKET_SRC_ENDPOINT:-}
 export BUCKET_SRC=${BUCKET_SRC:-}
-export FILE_SRC=${FILE_SRC:-}
+export FILE_SRC=${FILE_SRC:-""}
 export BUCKET_DST_ENDPOINT=${BUCKET_DST_ENDPOINT:-}
 export BUCKET_DST=${BUCKET_DST:-}
 export FILE_DST=${FILE_DST:-}
@@ -31,7 +31,7 @@ OPTIONS
   --provider                          Defines the bucket provider (aws, gcs, minio)
   --bucket-src-endpoint               Defines the source bucket endpoint
   --bucket-src                        Defines the source bucket
-  --file-src                          Defines the source file in the bucket
+  --file-src                          Defines the source file in the bucket (default: entire bucket)
   --bucket-dst-endpoint               Defines the destination bucket endpoint
   --bucket-dst                        Defines the destination bucket
   --file-dst                          Defines the destination file in the bucket

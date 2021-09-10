@@ -3,8 +3,6 @@
 # Source functions library.
 . ${BASE}/functions
 
-DST_DIR="/tmp"
-
 # Check for the required input
 if [ -z "${PROVIDER}" ]; then
   echo "You have to define the bucket provider"
@@ -20,10 +18,6 @@ if [ "${PROVIDER_LOWER}" = "minio" ] && [ -z "${BUCKET_SRC_ENDPOINT}" ]; then
 fi
 if [ -z "${BUCKET_SRC}" ]; then
   echo "You have to define the source bucket name"
-  exit 12
-fi
-if [ -z "${FILE_SRC}" ]; then
-  echo "You have to define the source file in the bucket"
   exit 12
 fi
 if [ "${PROVIDER_LOWER}" = "minio" ] && [ -z "${BUCKET_DST_ENDPOINT}" ]; then
@@ -45,10 +39,10 @@ debug "All the required inputs are present. Go on with the real job."
 debug "Copy the file from the source bucket to the destination bucket (provider: ${PROVIDER_LOWER})."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
-  rclone_aws copy :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST} 2> /dev/null
+  rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
-  rclone_gcs copy :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST} 2> /dev/null
+  rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for source minio service
@@ -81,7 +75,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
 
   debug "Wait for source minio service files (timeout ${TIMEOUT_BUCKET_SRC} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
-    rclone_minio ls :s3://${BUCKET_SRC}/${FILE} 1> /dev/null 2>&1
+    rclone_minio_multi ls src://${BUCKET_SRC}/${FILE_SRC} 1> /dev/null 2>&1
     EXIT_LS=$?
 
     debug "Check for loop ${LOOP_CNT} fail"
@@ -89,12 +83,12 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     sleep 1
 
     if [ ${LOOP_CNT} -ge ${TIMEOUT_BUCKET_SRC} ]; then
-      echo "ERROR: the file is not present in the bucket after ${TIMEOUT_BUCKET_SRC} seconds."
+      echo "ERROR: the file is not present in the source bucket after ${TIMEOUT_BUCKET_SRC} seconds."
       exit 13
     fi
   done
 
-  rclone_minio copy :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST} 2> /dev/null
+  rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 fi
 

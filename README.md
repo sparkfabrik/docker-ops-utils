@@ -2,11 +2,52 @@
 
 This is a very small docker image with some useful operation utils (like rclone, mysql-client, postgresql-client, wait-for-it).
 
+## AWS
+
+AWS specific comands.
+
+## Clean bucket (versioned)
+
+```bash
+docker run --rm ops-utils:latest aws clean-bucket
+```
+
+### Parameters
+
+| Parameter | Environment Variable | Description |
+| ----- | ----- | ----- |
+| `--bucket` | `BUCKET` | Defines the bucket |
+
+## Bucket operations
+
+Bucket specific commands.
+
+## Copy bucket
+
+```bash
+docker run --rm -it ops-utils:loc bucket copy-bucket
+```
+
+### Parameters
+
+| Parameter | Environment Variable | Description |
+| ----- | ----- | ----- |
+`--provider` | `PROVIDER` | Defines the bucket provider (aws, gcs, minio) |
+`--bucket-src-endpoint` | `BUCKET_SRC_ENDPOINT` | Defines the source bucket endpoint |
+`--bucket-src` | `BUCKET_SRC` | Defines the source bucket |
+`--file-src` | `FILE_SRC` | Defines the source file in the bucket (default: entire bucket) |
+`--bucket-dst-endpoint` | `BUCKET_DST_ENDPOINT` | Defines the destination bucket endpoint |
+`--bucket-dst` | `BUCKET_DST` | Defines the destination bucket |
+`--file-dst` | `FILE_DST` | Defines the destination file in the bucket |
+`--rclone-add-params` | `RCLONE_ADD_PARAMS` | Defines the additional parameters to be passed to rclone command |
+`--timeout-bucket-src` | `TIMEOUT_BUCKET_SRC` | Defines the maximum waiting time for source bucket set up (default 10s) |
+`--timeout-bucket-dst` | `TIMEOUT_BUCKET_DST` | Defines the maximum waiting time for destination bucket set up (default 10s) |
+
 ## MySQL
 
 MySQL specific commands. The commands can manage plain SQL or GZIP compressed dump files.
 
-### Import from bucket
+## Import from bucket
 
 ```bash
 docker run --rm ops-utils:latest mysql import-from-bucket
@@ -29,7 +70,7 @@ docker run --rm ops-utils:latest mysql import-from-bucket
 | `--timeout-bucket` | `TIMEOUT_BUCKET` | Defines the maximum waiting time for bucket set up (default 10s) |
 | `--timeout-mysql` | `TIMEOUT_MYSQL` | Defines the maximum waiting time for mysql service (default 30s) |
 
-### Export to bucket
+## Export to bucket
 
 ```bash
 docker run --rm ops-utils:latest mysql export-to-bucket
@@ -52,7 +93,7 @@ docker run --rm ops-utils:latest mysql export-to-bucket
 | `--timeout-bucket` | `TIMEOUT_BUCKET` | Defines the maximum waiting time for bucket set up (default 10s) |
 | `--timeout-mysql` | `TIMEOUT_MYSQL` | Defines the maximum waiting time for mysql service (default 30s) |
 
-### AWS Auth
+## AWS Auth
 
 In order to use the AWS S3 buckets you need to specify the following environment variables:
 
@@ -62,7 +103,7 @@ In order to use the AWS S3 buckets you need to specify the following environment
 | `AWS_SECRET_ACCESS_KEY` | AWS IAM secret access key |
 | `AWS_DEFAULT_REGION` | AWS bucket region |
 
-### GCS Auth
+## GCS Auth
 
 In order to use the Google Cloud Storage buckets you need to specify the following environment variable:
 
@@ -70,13 +111,13 @@ In order to use the Google Cloud Storage buckets you need to specify the followi
 | ----- | ----- |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Defines the file path of the service account file |
 
-### Minio Auth
+## Minio Auth
 
 In order to use the Minio buckets you need to specify the following environment variables:
 
 | Variable | Description |
 | ----- | ----- |
 | `BUCKET_ENDPOINT` | Defines the bucket endpoint |
-| `MINIO_ACCESS_KEY` | Minio access key |
-| `MINIO_SECRET_KEY` | Minio secret key |
+| `AWS_ACCESS_KEY_ID` | Minio access key |
+| `AWS_SECRET_ACCESS_KEY` | Minio secret key |
 

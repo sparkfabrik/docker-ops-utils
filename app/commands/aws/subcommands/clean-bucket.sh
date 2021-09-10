@@ -3,8 +3,6 @@
 # Source functions library.
 . ${BASE}/functions
 
-DST_DIR="/tmp"
-
 # Check for the required input
 if [ -z "${BUCKET}" ]; then
   echo "You have to define the bucket name"
