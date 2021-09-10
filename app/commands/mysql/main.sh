@@ -110,8 +110,8 @@ if [ ${DRY_RUN} -eq 1 ]; then
 fi
 
 # Real process
-if [ -x "${WD}/subcommand/${SUBCOMMAND}.sh" ]; then
-  SUBCMD="${WD}/subcommand/${SUBCOMMAND}.sh"
+if [ -x "${WD}/subcommands/${SUBCOMMAND}.sh" ]; then
+  SUBCMD="${WD}/subcommands/${SUBCOMMAND}.sh"
   exec "${SUBCMD}" "$@"
 else
   show_usage
