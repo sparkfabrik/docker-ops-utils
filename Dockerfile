@@ -1,5 +1,5 @@
 FROM alpine:3.13
-RUN apk add --no-cache file jq rclone mysql-client mariadb-connector-c postgresql-client bash curl aws-cli
+RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl aws-cli
 RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /usr/local/bin/wait-for-it
 

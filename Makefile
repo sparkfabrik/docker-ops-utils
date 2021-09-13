@@ -28,6 +28,7 @@ cli-test:
 test:
 	@./tests/mysql-import-from-bucket.sh
 	@./tests/mysql-export-to-bucket.sh
+	@./tests/copy-bucket.sh
 
 mysql-test-up:
 	@echo "\e[33mThis make target will reboot the test mysql service.\e[39m"

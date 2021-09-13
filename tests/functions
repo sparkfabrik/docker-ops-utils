@@ -68,6 +68,48 @@ query_exported_db() {
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME_EXP}' | tr -d "\r"
 }
 
+copyfiles() {
+  if [ -z "${1}" ] || [ -z "${2}" ]; then
+    echo "Copyfiles error"
+    exit 99
+  fi
+
+  FILE_SRC="${1}"
+  FILE_DST="${2}"
+
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    bucket copy-bucket --provider minio \
+    --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
+    --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
+}
+
+copybucket() {
+  if [ -z "${1}" ]; then
+    echo "Copybucket error"
+    exit 99
+  fi
+
+  FILE_DST="${1}"
+
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    bucket copy-bucket --provider minio \
+    --bucket-src-endpoint "http://minio:9000" --bucket-src seeds \
+    --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
+}
+
+bucketlsf() {
+  if [ -z "${1}" ] || [ -z "${2}" ]; then
+    echo "Bucketls error"
+    exit 99
+  fi
+
+  ENDPOINT="${1}"
+  FILE="${2}"
+
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
+    'rclone --s3-provider=Minio --s3-env-auth --s3-endpoint="'"${ENDPOINT}"'" lsf :s3:"'"${FILE}"'" 2>/dev/null' | tr -d "\r"
+}
+
 fail() {
   INFO=""
   if [ -n "${1}" ]; then

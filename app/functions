@@ -31,6 +31,12 @@ rclone_minio() {
     ${RCLONE_ADD_PARAMS} $@
 }
 
+rclone_minio_multi() {
+  envsubst < ${BASE}/rclone.conf > /tmp/rclone.conf
+  rclone --config=/tmp/rclone.conf \
+    ${RCLONE_ADD_PARAMS} $@
+}
+
 remove_http_proto() {
   echo "${1}" | sed 's|http[s]*://||g'
 }
