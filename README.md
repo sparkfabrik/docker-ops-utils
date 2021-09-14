@@ -25,7 +25,7 @@ Bucket specific commands.
 ## Copy bucket
 
 ```bash
-docker run --rm -it ops-utils:loc bucket copy-bucket
+docker run --rm ops-utils:latest bucket copy-bucket
 ```
 
 ### Parameters
