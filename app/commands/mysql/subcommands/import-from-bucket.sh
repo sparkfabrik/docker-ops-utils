@@ -4,7 +4,7 @@
 . ${BASE}/functions
 
 DST_DIR="/tmp"
-MIME_EXPECTED="text/plain"
+MIMES_EXPECTED="|text/plain|application/octet-stream|"
 
 # Check for the required input
 if [ -z "${DB_HOST}" ]; then
@@ -118,10 +118,13 @@ MIME_ACTUAL="$(file --mime-type "${DUMP_FILE}" | awk '{print $2}')"
 
 debug "The file mime-type is: ${MIME_ACTUAL}"
 
-if [ "${MIME_ACTUAL}" != "${MIME_EXPECTED}" ]; then
+echo "${MIMES_EXPECTED}" | grep "|${MIME_ACTUAL}|" 1> /dev/null 2>&1
+MIME_VALID=$?
+
+if [ ${MIME_VALID} -ne 0 ]; then
   echo "ERROR: the file has an incorrect mime type:"
   echo "Actual mime-type: '${MIME_ACTUAL}'."
-  echo "Expected mime-type: '${MIME_EXPECTED}'."
+  echo "Expected mime-type: '${MIMES_EXPECTED}'."
   exit 1
 fi
 
