@@ -26,8 +26,11 @@ cli-test:
 		$(IMAGE_NAME) ash -li
 
 test:
+	@echo "\e[33mTESTS for: mysql-import-from-bucket\e[39m"
 	@./tests/mysql-import-from-bucket.sh
+	@echo "\e[33mTESTS for: mysql-export-to-bucket\e[39m"
 	@./tests/mysql-export-to-bucket.sh
+	@echo "\e[33mTESTS for: copy-bucket\e[39m"
 	@./tests/copy-bucket.sh
 
 mysql-test-up:
