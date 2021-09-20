@@ -54,8 +54,10 @@ debug "All the required inputs are present. Go on with the real job."
 debug "Download the file from the bucket (provider: ${PROVIDER_LOWER})."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
+  debug "rclone_aws copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_aws copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
+  debug "rclone_gcs copy :gcs://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_gcs copy :gcs://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
@@ -76,6 +78,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
 
   debug "Wait for minio service (timeout ${TIMEOUT_BUCKET} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
+    debug "rclone_minio ls :s3://${BUCKET}/${FILE}"
     rclone_minio ls :s3://${BUCKET}/${FILE} 1> /dev/null 2>&1
     EXIT_LS=$?
 
@@ -89,10 +92,12 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     fi
   done
 
+  debug "rclone_minio copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_minio copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 fi
 
-DUMP_FILE="${DST_DIR}/${FILE}"
+LOCAL_FILE=$(basename "${FILE}")
+DUMP_FILE="${DST_DIR}/${LOCAL_FILE}"
 
 if [ ! -s "${DUMP_FILE}" ] || [ ! -r "${DUMP_FILE}" ]; then
   echo "ERROR: the file was not downloaded."

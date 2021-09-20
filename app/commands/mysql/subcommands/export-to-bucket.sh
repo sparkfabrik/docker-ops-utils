@@ -67,31 +67,37 @@ if [ "${DUMP_FILE: -3}" == ".gz" ]; then
   NEED_COMPRESSION=1
 fi
 
-mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" > "${DST_DIR}/${DUMP_FILE}"
+LOCAL_FILE=$(basename "${FILE}")
+LOCAL_DUMP_FILE=$(basename "${DUMP_FILE}")
+REMOTE_DIR="${FILE%${LOCAL_FILE}}"
+
+mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}"
 EXIT_MYSQLEXPORT=$?
 
 if [ ${EXIT_MYSQLEXPORT} -eq 0 ]; then
-  debug "The database was correctly exported (${DST_DIR}/${DUMP_FILE})."
+  debug "The database was correctly exported (${DST_DIR}/${LOCAL_DUMP_FILE})."
 else
   debug "Something went wrong during the mysqldump procedure."
   exit 13
 fi
 
 if [ ${NEED_COMPRESSION} -eq 1 ]; then
-  gzip "${DST_DIR}/${DUMP_FILE}"
+  gzip "${DST_DIR}/${LOCAL_DUMP_FILE}"
 fi
 
-if [ ! -s "${DST_DIR}/${FILE}" ] || [ ! -r "${DST_DIR}/${FILE}" ]; then
+if [ ! -s "${DST_DIR}/${LOCAL_FILE}" ] || [ ! -r "${DST_DIR}/${LOCAL_FILE}" ]; then
   echo "ERROR: the file was not created."
   exit 14
 fi
 
-debug "Upload the file ${FILE} to the bucket (provider: ${PROVIDER_LOWER})."
+debug "Upload the file ${LOCAL_FILE} to the bucket (provider: ${PROVIDER_LOWER})."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
-  rclone_aws copy "${DST_DIR}/${FILE}" :s3://${BUCKET}/
+  debug "rclone_aws copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  rclone_aws copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR}
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
-  rclone_gcs copy "${DST_DIR}/${FILE}" :gcs://${BUCKET}/ 2> /dev/null
+  debug "rclone_gcs copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  rclone_gcs copy "${DST_DIR}/${LOCAL_FILE}" :gcs://${BUCKET}/${REMOTE_DIR} 2> /dev/null
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
   WAIT_ENDPOINT=$(remove_http_proto "${BUCKET_ENDPOINT}")
@@ -111,6 +117,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
 
   debug "Wait for minio service (timeout ${TIMEOUT_BUCKET} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
+    debug "rclone_minio ls :s3://${BUCKET}/"
     rclone_minio ls :s3://${BUCKET}/ 1> /dev/null 2>&1
     EXIT_LS=$?
 
@@ -124,5 +131,6 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     fi
   done
 
-  rclone_minio copy "${DST_DIR}/${FILE}" :s3://${BUCKET}/ 2> /dev/null
+  debug "rclone_minio copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  rclone_minio copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR} 2> /dev/null
 fi

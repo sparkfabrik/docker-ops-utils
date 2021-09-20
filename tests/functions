@@ -42,10 +42,10 @@ mysqlimport_exported_db() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
 
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
-    mysql export-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump-exported.sql.gz
+    mysql export-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
   query "CREATE DATABASE ${DB_NAME_EXP};"
   docker-compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
-    mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump-exported.sql.gz
+    mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
 }
 
 query() {
