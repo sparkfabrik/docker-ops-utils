@@ -90,6 +90,7 @@ docker run --rm ops-utils:latest mysql export-to-bucket
 | `--bucket` | `BUCKET` | Defines the bucket |
 | `--file` | `FILE` | Defines the file in the bucket (*.sql or *.sql.gz) |
 | `--rclone-add-params` | `RCLONE_ADD_PARAMS` | Defines the additional parameters to be passed to rclone command |
+| `--mysqldump-add-params` | `MYSQLDUMP_ADD_PARAMS` | Defines the additional parameters to be passed to mysqldump command |
 | `--timeout-bucket` | `TIMEOUT_BUCKET` | Defines the maximum waiting time for bucket set up (default 10s) |
 | `--timeout-mysql` | `TIMEOUT_MYSQL` | Defines the maximum waiting time for mysql service (default 30s) |
 
