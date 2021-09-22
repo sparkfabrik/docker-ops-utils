@@ -71,7 +71,10 @@ LOCAL_FILE=$(basename "${FILE}")
 LOCAL_DUMP_FILE=$(basename "${DUMP_FILE}")
 REMOTE_DIR="${FILE%${LOCAL_FILE}}"
 
-mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}"
+debug "mysqldump execution"
+debug "mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" ${MYSQLDUMP_ADD_PARAMS} "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}""
+
+mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" ${MYSQLDUMP_ADD_PARAMS} "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}"
 EXIT_MYSQLEXPORT=$?
 
 if [ ${EXIT_MYSQLEXPORT} -eq 0 ]; then

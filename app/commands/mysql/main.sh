@@ -17,6 +17,7 @@ export BUCKET_ENDPOINT=${BUCKET_ENDPOINT:-}
 export BUCKET=${BUCKET:-}
 export FILE=${FILE:-}
 export RCLONE_ADD_PARAMS=${RCLONE_ADD_PARAMS:-}
+export MYSQLDUMP_ADD_PARAMS=${MYSQLDUMP_ADD_PARAMS:-}
 
 export TIMEOUT_BUCKET=${TIMEOUT_BUCKET:-10}
 export TIMEOUT_MYSQL=${TIMEOUT_MYSQL:-30}
@@ -41,6 +42,7 @@ OPTIONS
   --bucket                            Defines the bucket
   --file                              Defines the file in the bucket (*.sql or *.sql.gz)
   --rclone-add-params                 Defines the additional parameters to be passed to rclone command
+  --mysqldump-add-params              Defines the additional parameters to be passed to mysqldump command
   --timeout-bucket                    Defines the maximum waiting time for bucket set up (default ${TIMEOUT_BUCKET}s)
   --timeout-mysql                     Defines the maximum waiting time for mysql service (default ${TIMEOUT_MYSQL}s)
 EOM
@@ -64,6 +66,7 @@ EOM
   printf "%-${PAD}s %s\n" "BUCKET" "${BUCKET}"
   printf "%-${PAD}s %s\n" "FILE" "${FILE}"
   printf "%-${PAD}s %s\n" "RCLONE_ADD_PARAMS" "${RCLONE_ADD_PARAMS}"
+  printf "%-${PAD}s %s\n" "MYSQLDUMP_ADD_PARAMS" "${MYSQLDUMP_ADD_PARAMS}"
   printf "%-${PAD}s %s\n" "TIMEOUT_BUCKET" "${TIMEOUT_BUCKET}"
   printf "%-${PAD}s %s\n" "TIMEOUT_MYSQL" "${TIMEOUT_MYSQL}"
 }
@@ -92,6 +95,7 @@ while [ -n "${1}" ]; do
     --bucket) BUCKET="${2}"; shift 2 ;;
     --file) FILE="${2}"; shift 2 ;;
     --rclone-add-params) RCLONE_ADD_PARAMS="${2}"; shift 2 ;;
+    --mysqldump-add-params) MYSQLDUMP_ADD_PARAMS="${2}"; shift 2 ;;
     --timeout-bucket) TIMEOUT_BUCKET="${2}"; shift 2 ;;
     --timeout-mysql) TIMEOUT_MYSQL="${2}"; shift 2 ;;
     -*|--*=) echo "Error: Unsupported flag ${1}" >&2; exit 1 ;;
