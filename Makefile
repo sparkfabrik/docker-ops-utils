@@ -23,6 +23,7 @@ cli-dev: build
 cli-test:
 	docker-compose -f tests/docker-compose.yml run \
 		-v ${PWD}/app:/app \
+		-w /app \
 		$(IMAGE_NAME) ash -li
 
 test:
@@ -30,8 +31,10 @@ test:
 	@./tests/mysql-import-from-bucket.sh
 	@echo "\e[33mTESTS for: mysql-export-to-bucket\e[39m"
 	@./tests/mysql-export-to-bucket.sh
-	@echo "\e[33mTESTS for: copy-bucket\e[39m"
-	@./tests/copy-bucket.sh
+	@echo "\e[33mTESTS for: mysql-drop-db-tables\e[39m"
+	@./tests/mysql-drop-db-tables.sh
+	@echo "\e[33mTESTS for: bucket-copy-bucket\e[39m"
+	@./tests/bucket-copy-bucket.sh
 
 mysql-test-up:
 	@echo "\e[33mThis make target will reboot the test mysql service.\e[39m"

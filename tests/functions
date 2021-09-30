@@ -48,6 +48,11 @@ mysqlimport_exported_db() {
     mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
 }
 
+mysqldroptables() {
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    mysql drop-db-tables
+}
+
 query() {
   if [ -z "${1}" ]; then
     echo "Query error"
@@ -55,7 +60,7 @@ query() {
   fi
 
   docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
-    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME}' | tr -d "\r"
+    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'"${1}"'"' | tr -d "\r"
 }
 
 query_exported_db() {
@@ -65,7 +70,7 @@ query_exported_db() {
   fi
 
   docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
-    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} -e "'"${1}"'" ${DB_NAME_EXP}' | tr -d "\r"
+    'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME_EXP}" -e "'"${1}"'"' | tr -d "\r"
 }
 
 copyfiles() {
