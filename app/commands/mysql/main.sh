@@ -30,6 +30,7 @@ SUBCOMMANDS
   help                                Print this help message
   import-from-bucket                  Import database from a bucket file
   export-to-bucket                    Export database (mysqldump) to a bucket
+  drop-db-tables                      Drop all tables in the database
 
 OPTIONS
   --db-host                           Defines the database host

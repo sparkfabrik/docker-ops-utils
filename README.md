@@ -94,6 +94,23 @@ docker run --rm ops-utils:latest mysql export-to-bucket
 | `--timeout-bucket` | `TIMEOUT_BUCKET` | Defines the maximum waiting time for bucket set up (default 10s) |
 | `--timeout-mysql` | `TIMEOUT_MYSQL` | Defines the maximum waiting time for mysql service (default 30s) |
 
+## Drop DB tables
+
+```bash
+docker run --rm ops-utils:latest mysql drop-db-tables
+```
+
+### Paramenters
+
+| Parameter | Environment Variable | Description |
+| ----- | ----- | ----- |
+| `--db-host` | `DB_HOST` | Defines the database host |
+| `--db-user` | `DB_USER` | Defines the database user |
+| `--db-password` | `DB_PASSWORD` | Defines the database password |
+| `--db-name` | `DB_NAME` | Defines the database name |
+| `--db-port` | `DB_PORT` | Defines the database port [default: 3306] |
+| `--timeout-mysql` | `TIMEOUT_MYSQL` | Defines the maximum waiting time for mysql service (default 30s) |
+
 ## AWS Auth
 
 In order to use the AWS S3 buckets you need to specify the following environment variables:
