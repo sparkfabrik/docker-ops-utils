@@ -16,7 +16,7 @@ export DRY_RUN=0
 export TOPIC=
 export WD=
 
-export DEBUG=${DEBUG:-0}
+export DEBUG=${DEBUG:-1}
 
 show_usage() {
   cat <<EOM
