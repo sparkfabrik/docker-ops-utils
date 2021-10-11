@@ -149,7 +149,7 @@ mysql -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" 
 EXIT_MYSQLIMPORT=$?
 
 if [ ${EXIT_MYSQLIMPORT} -eq 0 ]; then
-  debug "The database was correctly imported."
+  debug "The database \"${DB_NAME}\" was correctly imported to \"${DB_HOST}:${DB_PORT}\""
 else
   debug "Something went wrong during the mysql import procedure."
 fi
