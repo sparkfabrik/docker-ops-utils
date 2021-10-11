@@ -26,7 +26,14 @@ if [ -z "${DB_PORT}" ]; then
 fi
 
 # All the required inputs are present! Do the job
-debug "All the required inputs are present. Go on with the real job."
+echo "All the required inputs are present. Go on with the real job."
+
+echo "Drop all tables from database."
+format_string "Parameters:" "g"
+echo "$(format_string "Host:" "bold") ${DB_HOST}"
+echo "$(format_string "Port:" "bold") ${DB_PORT}"
+echo "$(format_string "User:" "bold") ${DB_USER}"
+echo "$(format_string "Database:" "bold") ${DB_NAME}"
 
 MYSQL_CMD="mysql --skip-column-names --silent --raw -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" --database="${DB_NAME}""
 
@@ -40,7 +47,7 @@ if [ ${EXIT_WAIT} -ne 0 ]; then
   exit ${EXIT_WAIT}
 fi
 
-debug "Fetch database tables"
+echo "Fetch database tables."
 debug "${MYSQL_CMD} -e \"SHOW TABLES;\""
 
 TABLES=$(${MYSQL_CMD} -e "SHOW TABLES;")
@@ -49,7 +56,7 @@ if [ -z "${TABLES}" ]; then
   exit 0
 fi
 
-debug "There are some tables to be deleted"
+echo "There are some tables to be deleted."
 
 QUERY="SET FOREIGN_KEY_CHECKS = 0;"
 JOINED_TABLES=""
@@ -60,9 +67,17 @@ done
 
 QUERY="${QUERY} SET FOREIGN_KEY_CHECKS = 1;"
 
-debug "Drop all tables"
+echo "Drop all tables."
 debug "${MYSQL_CMD} -e \"${QUERY}\""
 
 ${MYSQL_CMD} -e "${QUERY}"
+EXIT_CMD=$?
 
-debug "The database is now empty"
+if [ ${EXIT_CMD} -ne 0 ]; then
+  echo "Something went wrong during the drop all tables."
+  exit ${EXIT_CMD}
+fi
+
+echo "The database is now empty."
+exit ${EXIT_CMD}
+

@@ -34,14 +34,20 @@ if [ -z "${FILE_DST}" ]; then
 fi
 
 # All the required inputs are present! Do the job
-debug "All the required inputs are present. Go on with the real job."
+echo "All the required inputs are present. Go on with the real job."
 
-debug "Copy the file from the source bucket to the destination bucket (provider: ${PROVIDER_LOWER})."
+echo "Copy the file from the source bucket to the destination bucket."
+format_string "Parameters:" "g"
+echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
+echo "$(format_string "Src:" "bold") ${BUCKET_SRC}/${FILE_SRC}"
+echo "$(format_string "Dst:" "bold") ${BUCKET_DST}/${FILE_DST}"
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
+  echo "rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}"
   rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
+  echo "rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST}"
   rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
@@ -88,14 +94,15 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     fi
   done
 
+  echo "rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}"
   rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST} 2> /dev/null
   EXIT_RCLONE=$?
 fi
 
-if [ ${EXIT_RCLONE} -eq 0 ]; then
-  debug "The file was correctly copied."
-else
-  debug "Something went wrong during the copy of files."
+if [ ${EXIT_RCLONE} -ne 0 ]; then
+  echo "Something went wrong during the copy of files."
+  exit ${EXIT_RCLONE}
 fi
 
+echo "The file was correctly copied."
 exit ${EXIT_RCLONE}

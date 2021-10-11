@@ -16,7 +16,7 @@ export DRY_RUN=0
 export TOPIC=
 export WD=
 
-export DEBUG=${DEBUG:-1}
+export DEBUG=${DEBUG:-0}
 
 show_usage() {
   cat <<EOM
@@ -45,7 +45,7 @@ EOM
 
 # Process arguments
 PARAMS=""
-while [ -n "${1}" ]; do
+while [ -n "${1:-}" ]; do
   case "$1" in
     --help|-h) show_usage; exit 0 ;;
     --dry-run) DRY_RUN=1; shift ;;

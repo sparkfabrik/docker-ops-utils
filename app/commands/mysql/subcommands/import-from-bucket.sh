@@ -49,15 +49,24 @@ if [ -z "${FILE}" ]; then
 fi
 
 # All the required inputs are present! Do the job
-debug "All the required inputs are present. Go on with the real job."
+echo "All the required inputs are present. Go on with the real job."
 
-debug "Download the file from the bucket (provider: ${PROVIDER_LOWER})."
+echo "Import MySQL dump from bucket."
+format_string "Parameters:" "g"
+echo "$(format_string "Host:" "bold") ${DB_HOST}"
+echo "$(format_string "Port:" "bold") ${DB_PORT}"
+echo "$(format_string "User:" "bold") ${DB_USER}"
+echo "$(format_string "Database:" "bold") ${DB_NAME}"
+echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
+echo "$(format_string "Dst:" "bold") ${BUCKET}/${FILE}"
+
+echo "Download the file from the bucket."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
-  debug "rclone_aws copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
+  echo "rclone_aws copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_aws copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
-  debug "rclone_gcs copy :gcs://${BUCKET}/${FILE} \"${DST_DIR}\""
+  echo "rclone_gcs copy :gcs://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_gcs copy :gcs://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
@@ -92,7 +101,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     fi
   done
 
-  debug "rclone_minio copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
+  echo "rclone_minio copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
   rclone_minio copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
 fi
 
@@ -105,10 +114,10 @@ if [ ! -s "${DUMP_FILE}" ] || [ ! -r "${DUMP_FILE}" ]; then
   exit 14
 fi
 
-debug "The file was correctly downloaded."
+debug "Check if decompression is needed."
 
 if [ "$(file --mime-type "${DUMP_FILE}" | awk '{print $2}')" = "application/gzip" ]; then
-  debug "The downloaded file is gzipped. I will unzip the file ${DUMP_FILE} in ${DUMP_FILE%.gz}."
+  echo "The downloaded file is gzipped. I will unzip the file ${DUMP_FILE} in ${DUMP_FILE%.gz}."
   rm -f "${DUMP_FILE%.gz}"
   gzip -dk "${DUMP_FILE}"
   DUMP_FILE=${DUMP_FILE%.gz}
@@ -121,19 +130,19 @@ fi
 
 MIME_ACTUAL="$(file --mime-type "${DUMP_FILE}" | awk '{print $2}')"
 
-debug "The file mime-type is: ${MIME_ACTUAL}"
+echo "Check if the dump file mime-type is valid."
+echo "The file mime-type is: '${MIME_ACTUAL}'"
+echo "The expected mime-type is one of: '${MIMES_EXPECTED}'"
 
 echo "${MIMES_EXPECTED}" | grep "|${MIME_ACTUAL}|" 1> /dev/null 2>&1
 MIME_VALID=$?
 
 if [ ${MIME_VALID} -ne 0 ]; then
   echo "ERROR: the file has an incorrect mime type:"
-  echo "Actual mime-type: '${MIME_ACTUAL}'."
-  echo "Expected mime-type: '${MIMES_EXPECTED}'."
   exit 1
 fi
 
-debug "The file mime-type is valid. Go on with db import."
+echo "The file mime-type is valid. Go on with db import."
 
 # Wait for mysql service
 debug "Wait for mysql service (timeout 30 seconds)."
@@ -145,13 +154,14 @@ if [ ${EXIT_WAIT} -ne 0 ]; then
   exit ${EXIT_WAIT}
 fi
 
+echo "Exec mysql import."
 mysql -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" < "${DUMP_FILE}"
-EXIT_MYSQLIMPORT=$?
+EXIT_CMD=$?
 
-if [ ${EXIT_MYSQLIMPORT} -eq 0 ]; then
-  debug "The database \"${DB_NAME}\" was correctly imported to \"${DB_HOST}:${DB_PORT}\""
-else
-  debug "Something went wrong during the mysql import procedure."
+if [ ${EXIT_CMD} -ne 0 ]; then
+  echo "Something went wrong during the mysql import procedure."
+  exit ${EXIT_CMD}
 fi
 
-exit ${EXIT_MYSQLIMPORT}
+echo "The database \"${DB_NAME}\" was correctly imported to \"${DB_HOST}:${DB_PORT}\"."
+exit ${EXIT_CMD}
