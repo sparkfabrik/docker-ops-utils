@@ -42,7 +42,7 @@ shift
 
 # Process arguments
 PARAMS=""
-while [ -n "${1}" ]; do
+while [ -n "${1:-}" ]; do
   case "${1}" in
     --bucket) BUCKET="${2}"; shift 2 ;;
     -*|--*=) echo "Error: Unsupported flag ${1}" >&2; exit 1 ;;

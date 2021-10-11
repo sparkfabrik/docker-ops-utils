@@ -4,9 +4,32 @@
 # shell scripts in the /app directory.
 #
 
+set -u
+if [ ${DEBUG} -eq 1 ]; then
+  echo "Activate the debug mode (set -x)"
+  set -x
+fi
+
 debug() {
-  if [ -n "${1}" ] && [ ${DEBUG} -eq 1 ]; then
+  if [ -n "${1:-}" ] && [ ${DEBUG} -eq 1 ]; then
     echo "${1}"
+  fi
+}
+
+format_string() {
+  if [ -n "${1:-}" ]; then
+    END="\e[39m"
+    case "${2}" in
+      g|gree) PRE="\e[32m" ;;
+      y|yellow) PRE="\e[33m" ;;
+      r|red) PRE="\e[31m" ;;
+      bold) PRE="\e[1m"; END="\e[0m"; ;;
+      italic) PRE="\e[3m" END="\e[0m"; ;;
+      underlined) PRE="\e[4m" END="\e[0m"; ;;
+      *) PRE=""; END=""; ;;
+    esac
+
+    echo -e "${PRE}${1}${END}"
   fi
 }
 

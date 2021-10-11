@@ -48,7 +48,16 @@ if [ -z "${FILE}" ]; then
 fi
 
 # All the required inputs are present! Do the job
-debug "All the required inputs are present. Go on with the real job."
+echo "All the required inputs are present. Go on with the real job."
+
+echo "Export MySQL dump to bucket."
+format_string "Parameters:" "g"
+echo "$(format_string "Host:" "bold") ${DB_HOST}"
+echo "$(format_string "Port:" "bold") ${DB_PORT}"
+echo "$(format_string "User:" "bold") ${DB_USER}"
+echo "$(format_string "Database:" "bold") ${DB_NAME}"
+echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
+echo "$(format_string "Dst:" "bold") ${BUCKET}/${FILE}"
 
 # Wait for mysql service
 debug "Wait for mysql service (timeout ${TIMEOUT_MYSQL} seconds)."
@@ -71,20 +80,21 @@ LOCAL_FILE=$(basename "${FILE}")
 LOCAL_DUMP_FILE=$(basename "${DUMP_FILE}")
 REMOTE_DIR="${FILE%${LOCAL_FILE}}"
 
-debug "mysqldump execution"
+echo "Exec mysqldump."
 debug "mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" ${MYSQLDUMP_ADD_PARAMS} "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}""
 
 mysqldump -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" ${MYSQLDUMP_ADD_PARAMS} "${DB_NAME}" > "${DST_DIR}/${LOCAL_DUMP_FILE}"
 EXIT_MYSQLEXPORT=$?
 
 if [ ${EXIT_MYSQLEXPORT} -eq 0 ]; then
-  debug "The database was correctly exported (${DST_DIR}/${LOCAL_DUMP_FILE})."
+  echo "The database was correctly exported (${DST_DIR}/${LOCAL_DUMP_FILE})."
 else
-  debug "Something went wrong during the mysqldump procedure."
+  echo "Something went wrong during the mysqldump procedure."
   exit 13
 fi
 
 if [ ${NEED_COMPRESSION} -eq 1 ]; then
+  echo "Compress the dump (${DST_DIR}/${LOCAL_FILE})."
   gzip "${DST_DIR}/${LOCAL_DUMP_FILE}"
 fi
 
@@ -96,11 +106,13 @@ fi
 debug "Upload the file ${LOCAL_FILE} to the bucket (provider: ${PROVIDER_LOWER})."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
-  debug "rclone_aws copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  echo "rclone_aws copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
   rclone_aws copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR}
+  EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
-  debug "rclone_gcs copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  echo "rclone_gcs copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
   rclone_gcs copy "${DST_DIR}/${LOCAL_FILE}" :gcs://${BUCKET}/${REMOTE_DIR} 2> /dev/null
+  EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
   WAIT_ENDPOINT=$(remove_http_proto "${BUCKET_ENDPOINT}")
@@ -134,6 +146,15 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     fi
   done
 
-  debug "rclone_minio copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
+  echo "rclone_minio copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
   rclone_minio copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR} 2> /dev/null
+  EXIT_RCLONE=$?
 fi
+
+if [ ${EXIT_RCLONE} -ne 0 ]; then
+  echo "Something went wrong during the copy of dump file into bucket."
+  exit ${EXIT_RCLONE}
+fi
+
+echo "The dump file was correctly copied in the destination bucket."
+exit ${EXIT_RCLONE}

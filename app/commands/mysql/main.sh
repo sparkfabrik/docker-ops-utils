@@ -84,7 +84,7 @@ shift
 
 # Process arguments
 PARAMS=""
-while [ -n "${1}" ]; do
+while [ -n "${1:-}" ]; do
   case "${1}" in
     --db-host) DB_HOST="${2}"; shift 2 ;;
     --db-user) DB_USER="${2}"; shift 2 ;;

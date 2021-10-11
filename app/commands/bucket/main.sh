@@ -73,7 +73,7 @@ shift
 
 # Process arguments
 PARAMS=""
-while [ -n "${1}" ]; do
+while [ -n "${1:-}" ]; do
   case "${1}" in
     --provider) PROVIDER="${2}"; shift 2 ;;
     --bucket-src-endpoint) BUCKET_SRC_ENDPOINT="${2}"; shift 2 ;;

@@ -59,7 +59,7 @@ query() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'"${1}"'"' | tr -d "\r"
 }
 
@@ -69,7 +69,7 @@ query_exported_db() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --entrypoint ash --rm ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME_EXP}" -e "'"${1}"'"' | tr -d "\r"
 }
 
