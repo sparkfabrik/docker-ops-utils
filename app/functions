@@ -4,14 +4,13 @@
 # shell scripts in the /app directory.
 #
 
-set -u
-if [ ${DEBUG} -eq 1 ]; then
+if [ ${DEBUG:-0} -eq 1 ]; then
   echo "Activate the debug mode (set -x)"
   set -x
 fi
 
 debug() {
-  if [ -n "${1:-}" ] && [ ${DEBUG} -eq 1 ]; then
+  if [ -n "${1:-}" ] && [ ${DEBUG:-0} -eq 1 ]; then
     echo "${1}"
   fi
 }
