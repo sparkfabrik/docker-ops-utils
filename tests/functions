@@ -12,7 +12,7 @@ export FAIL_STR="\e[31mFAIL\e[39m"
 
 getenvvar() {
   if [ -z "${1}" ]; then
-    echo "getenv error"
+    echo "getenv error (missing variable name as first parameter)"
     exit 99
   fi
 
@@ -55,7 +55,7 @@ mysqldroptables() {
 
 query() {
   if [ -z "${1}" ]; then
-    echo "Query error"
+    echo "Query error (missing query as first parameter)"
     exit 99
   fi
 
@@ -65,7 +65,7 @@ query() {
 
 query_exported_db() {
   if [ -z "${1}" ]; then
-    echo "Query error"
+    echo "Query error (missing query as first parameter)"
     exit 99
   fi
 
@@ -75,7 +75,7 @@ query_exported_db() {
 
 copyfiles() {
   if [ -z "${1}" ] || [ -z "${2}" ]; then
-    echo "Copyfiles error"
+    echo "Copyfiles error (missing file src as first parameter or file dst as second parameter)"
     exit 99
   fi
 
@@ -88,9 +88,9 @@ copyfiles() {
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
 }
 
-copybucket() {
+copytobucket() {
   if [ -z "${1}" ]; then
-    echo "Copybucket error"
+    echo "Copytobucket error (missing file dst as first parameter)"
     exit 99
   fi
 
@@ -102,9 +102,23 @@ copybucket() {
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
 }
 
+copyfrombucket() {
+  if [ -z "${1}" ]; then
+    echo "Copyfrombucket error (missing file src as first parameter)"
+    exit 99
+  fi
+
+  FILE_SRC="${1}"
+
+  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+    bucket copy-bucket --provider minio \
+    --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
+    --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket
+}
+
 bucketlsf() {
   if [ -z "${1}" ] || [ -z "${2}" ]; then
-    echo "Bucketls error"
+    echo "Bucketls error (missing bucket endpoint as first parameter or file path as second parameter)"
     exit 99
   fi
 

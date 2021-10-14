@@ -20,6 +20,8 @@ services:
     environment:
       MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
       MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - 9001:9000
 
   minio-dst:
     image: minio/minio:RELEASE.2021-02-23T20-05-01Z
