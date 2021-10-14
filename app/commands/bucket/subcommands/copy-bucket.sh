@@ -28,10 +28,6 @@ if [ -z "${BUCKET_DST}" ]; then
   echo "You have to define the destination bucket name"
   exit 12
 fi
-if [ -z "${FILE_DST}" ]; then
-  echo "You have to define the destination file in the bucket"
-  exit 12
-fi
 
 # All the required inputs are present! Do the job
 echo "All the required inputs are present. Go on with the real job."
@@ -41,6 +37,13 @@ format_string "Parameters:" "g"
 echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
 echo "$(format_string "Src:" "bold") ${BUCKET_SRC}/${FILE_SRC}"
 echo "$(format_string "Dst:" "bold") ${BUCKET_DST}/${FILE_DST}"
+if [ -z "${FILE_SRC}" ] && [ -z "${FILE_DST}" ]; then
+  echo "$(format_string "Full bucket copy:" "bold") ${BUCKET_SRC} => ${BUCKET_DST}"
+elif [ -z "${FILE_SRC}" ]; then
+  echo "$(format_string "Full bucket copy:" "bold") ${BUCKET_SRC} => ${BUCKET_DST}/${FILE_DST}"
+elif [ -z "${FILE_DST}" ]; then
+  echo "$(format_string "Full bucket copy:" "bold") ${BUCKET_SRC}/${FILE_SRC} => ${BUCKET_DST}"
+fi
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
   echo "rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}"
