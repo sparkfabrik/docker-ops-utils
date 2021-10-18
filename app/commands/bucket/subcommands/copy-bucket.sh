@@ -44,6 +44,7 @@ elif [ -z "${FILE_SRC}" ]; then
 elif [ -z "${FILE_DST}" ]; then
   echo "$(format_string "Full bucket copy:" "bold") ${BUCKET_SRC}/${FILE_SRC} => ${BUCKET_DST}"
 fi
+echo "$(format_string "ACL:" "bold") ${ACL}"
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
   echo "rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}"

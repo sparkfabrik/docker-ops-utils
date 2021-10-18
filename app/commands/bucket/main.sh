@@ -14,6 +14,7 @@ export FILE_SRC=${FILE_SRC:-""}
 export BUCKET_DST_ENDPOINT=${BUCKET_DST_ENDPOINT:-}
 export BUCKET_DST=${BUCKET_DST:-}
 export FILE_DST=${FILE_DST:-""}
+export ACL=${ACL:-}
 export RCLONE_ADD_PARAMS=${RCLONE_ADD_PARAMS:-}
 
 export TIMEOUT_BUCKET_SRC=${TIMEOUT_BUCKET_SRC:-10}
@@ -35,6 +36,7 @@ OPTIONS
   --bucket-dst-endpoint               Defines the destination bucket endpoint
   --bucket-dst                        Defines the destination bucket
   --file-dst                          Defines the destination file in the bucket
+  --acl                               Difines the ACL used to create the copied objects in the destination
   --rclone-add-params                 Defines the additional parameters to be passed to rclone command
   --timeout-bucket-src                Defines the maximum waiting time for source bucket set up (default ${TIMEOUT_BUCKET_SRC}s)
   --timeout-bucket-dst                Defines the maximum waiting time for destination bucket set up (default ${TIMEOUT_BUCKET_DST}s)
@@ -56,6 +58,7 @@ EOM
   printf "%-${PAD}s %s\n" "BUCKET_DST_ENDPOINT" "${BUCKET_DST_ENDPOINT}"
   printf "%-${PAD}s %s\n" "BUCKET_DST" "${BUCKET_DST}"
   printf "%-${PAD}s %s\n" "FILE_DST" "${FILE_DST}"
+  printf "%-${PAD}s %s\n" "ACL" "${ACL}"
   printf "%-${PAD}s %s\n" "RCLONE_ADD_PARAMS" "${RCLONE_ADD_PARAMS}"
   printf "%-${PAD}s %s\n" "TIMEOUT_BUCKET_SRC" "${TIMEOUT_BUCKET_SRC}"
   printf "%-${PAD}s %s\n" "TIMEOUT_BUCKET_DST" "${TIMEOUT_BUCKET_DST}"
@@ -82,6 +85,7 @@ while [ -n "${1:-}" ]; do
     --bucket-dst-endpoint) BUCKET_DST_ENDPOINT="${2}"; shift 2 ;;
     --bucket-dst) BUCKET_DST="${2}"; shift 2 ;;
     --file-dst) FILE_DST="${2}"; shift 2 ;;
+    --acl) ACL="${2}"; shift 2 ;;
     --rclone-add-params) RCLONE_ADD_PARAMS="${2}"; shift 2 ;;
     --timeout-bucket-src) TIMEOUT_BUCKET_SRC="${2}"; shift 2 ;;
     --timeout-bucket-dst) TIMEOUT_BUCKET_DST="${2}"; shift 2 ;;

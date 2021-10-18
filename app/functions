@@ -32,31 +32,40 @@ format_string() {
   fi
 }
 
+S3_ACL=""
+if [ -n "${ACL}" ]; then
+  S3_ACL="--s3-acl ${ACL}"
+fi
+
 rclone_aws() {
+  echo "rclone --s3-region="${AWS_DEFAULT_REGION}" --s3-location-constraint="${AWS_DEFAULT_REGION}" --s3-env-auth ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
   rclone \
     --s3-region="${AWS_DEFAULT_REGION}" \
     --s3-location-constraint="${AWS_DEFAULT_REGION}" \
     --s3-env-auth \
-    ${RCLONE_ADD_PARAMS} $@
+    ${S3_ACL} ${RCLONE_ADD_PARAMS} $@
 }
 
 rclone_gcs() {
+  echo "rclone ${RCLONE_ADD_PARAMS} $@"
   rclone \
     ${RCLONE_ADD_PARAMS} $@
 }
 
 rclone_minio() {
+  echo "rclone --s3-provider=Minio --s3-endpoint=${BUCKET_ENDPOINT} --s3-env-auth ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
   rclone \
     --s3-provider=Minio \
     --s3-endpoint=${BUCKET_ENDPOINT} \
     --s3-env-auth \
-    ${RCLONE_ADD_PARAMS} $@
+    ${S3_ACL} ${RCLONE_ADD_PARAMS} $@
 }
 
 rclone_minio_multi() {
+  echo "rclone --config=/tmp/rclone.conf ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
   envsubst < ${BASE}/rclone.conf > /tmp/rclone.conf
   rclone --config=/tmp/rclone.conf \
-    ${RCLONE_ADD_PARAMS} $@
+    ${S3_ACL} ${RCLONE_ADD_PARAMS} $@
 }
 
 remove_http_proto() {
