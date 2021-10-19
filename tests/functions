@@ -83,7 +83,7 @@ copyfiles() {
   FILE_DST="${2}"
 
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
-    bucket copy-bucket --provider minio \
+    bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
 }
@@ -97,7 +97,7 @@ copytobucket() {
   FILE_DST="${1}"
 
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
-    bucket copy-bucket --provider minio \
+    bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
 }
@@ -111,7 +111,7 @@ copyfrombucket() {
   FILE_SRC="${1}"
 
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
-    bucket copy-bucket --provider minio \
+    bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket
 }
