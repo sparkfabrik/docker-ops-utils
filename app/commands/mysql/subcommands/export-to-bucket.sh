@@ -111,7 +111,7 @@ if [ "${PROVIDER_LOWER}" = "aws" ]; then
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
   echo "rclone_gcs copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
-  rclone_gcs copy "${DST_DIR}/${LOCAL_FILE}" :gcs://${BUCKET}/${REMOTE_DIR} 2> /dev/null
+  rclone_gcs copy "${DST_DIR}/${LOCAL_FILE}" :gcs://${BUCKET}/${REMOTE_DIR}
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
@@ -133,7 +133,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   debug "Wait for minio service (timeout ${TIMEOUT_BUCKET} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
     debug "rclone_minio ls :s3://${BUCKET}/"
-    rclone_minio ls :s3://${BUCKET}/ 1> /dev/null 2>&1
+    rclone_minio ls :s3://${BUCKET}/ 1> /dev/null
     EXIT_LS=$?
 
     debug "Check for loop ${LOOP_CNT} fail"
@@ -147,7 +147,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   done
 
   echo "rclone_minio copy \"${DST_DIR}/${LOCAL_FILE}\" :s3://${BUCKET}/${REMOTE_DIR}"
-  rclone_minio copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR} 2> /dev/null
+  rclone_minio copy "${DST_DIR}/${LOCAL_FILE}" :s3://${BUCKET}/${REMOTE_DIR}
   EXIT_RCLONE=$?
 fi
 
