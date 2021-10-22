@@ -64,10 +64,10 @@ echo "Download the file from the bucket."
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
   echo "rclone_aws copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
-  rclone_aws copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
+  rclone_aws copy :s3://${BUCKET}/${FILE} "${DST_DIR}"
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
   echo "rclone_gcs copy :gcs://${BUCKET}/${FILE} \"${DST_DIR}\""
-  rclone_gcs copy :gcs://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
+  rclone_gcs copy :gcs://${BUCKET}/${FILE} "${DST_DIR}"
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for minio service
   WAIT_ENDPOINT=$(remove_http_proto "${BUCKET_ENDPOINT}")
@@ -88,7 +88,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   debug "Wait for minio service (timeout ${TIMEOUT_BUCKET} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
     debug "rclone_minio ls :s3://${BUCKET}/${FILE}"
-    rclone_minio ls :s3://${BUCKET}/${FILE} 1> /dev/null 2>&1
+    rclone_minio ls :s3://${BUCKET}/${FILE} 1> /dev/null
     EXIT_LS=$?
 
     debug "Check for loop ${LOOP_CNT} fail"
@@ -102,7 +102,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   done
 
   echo "rclone_minio copy :s3://${BUCKET}/${FILE} \"${DST_DIR}\""
-  rclone_minio copy :s3://${BUCKET}/${FILE} "${DST_DIR}" 2> /dev/null
+  rclone_minio copy :s3://${BUCKET}/${FILE} "${DST_DIR}"
 fi
 
 LOCAL_FILE=$(basename "${FILE}")

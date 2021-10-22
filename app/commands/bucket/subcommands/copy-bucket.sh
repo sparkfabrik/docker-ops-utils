@@ -48,11 +48,11 @@ echo "$(format_string "ACL:" "bold") ${ACL}"
 
 if [ "${PROVIDER_LOWER}" = "aws" ]; then
   echo "rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}"
-  rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST} 2> /dev/null
+  rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
   echo "rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST}"
-  rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST} 2> /dev/null
+  rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST}
   EXIT_RCLONE=$?
 elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for source minio service
@@ -85,7 +85,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
 
   debug "Wait for source minio service files (timeout ${TIMEOUT_BUCKET_SRC} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
-    rclone_minio_multi ls src://${BUCKET_SRC}/${FILE_SRC} 1> /dev/null 2>&1
+    rclone_minio_multi ls src://${BUCKET_SRC}/${FILE_SRC} 1> /dev/null
     EXIT_LS=$?
 
     debug "Check for loop ${LOOP_CNT} fail"
@@ -99,7 +99,7 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
   done
 
   echo "rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}"
-  rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST} 2> /dev/null
+  rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}
   EXIT_RCLONE=$?
 fi
 
