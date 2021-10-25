@@ -4,15 +4,23 @@
 . ${BASE}/functions
 
 # Check for the required input
-if [ -z "${PROVIDER}" ]; then
-  echo "You have to define the bucket provider"
+if [ -z "${PROVIDER_SRC}" ]; then
+  echo "You have to define the source bucket provider"
   exit 12
 fi
-if [ "${PROVIDER_LOWER}" != "aws" ] && [ "${PROVIDER_LOWER}" != "gcs" ] && [ "${PROVIDER_LOWER}" != "minio" ]; then
+if [ -z "${PROVIDER_DST}" ]; then
+  echo "You have to define the destination bucket provider"
+  exit 12
+fi
+if [ "${PROVIDER_SRC_LOWER}" != "aws" ] && [ "${PROVIDER_SRC_LOWER}" != "gcs" ] && [ "${PROVIDER_SRC_LOWER}" != "minio" ]; then
   echo "You have to define a valid bucket provider (aws, gcs, minio)"
   exit 12
 fi
-if [ "${PROVIDER_LOWER}" = "minio" ] && [ -z "${BUCKET_SRC_ENDPOINT}" ]; then
+if [ "${PROVIDER_DST_LOWER}" != "aws" ] && [ "${PROVIDER_DST_LOWER}" != "gcs" ] && [ "${PROVIDER_DST_LOWER}" != "minio" ]; then
+  echo "You have to define a valid bucket provider (aws, gcs, minio)"
+  exit 12
+fi
+if [ "${PROVIDER_SRC_LOWER}" = "minio" ] && [ -z "${BUCKET_SRC_ENDPOINT}" ]; then
   echo "You have to define the source bucket endpoint"
   exit 12
 fi
@@ -20,7 +28,7 @@ if [ -z "${BUCKET_SRC}" ]; then
   echo "You have to define the source bucket name"
   exit 12
 fi
-if [ "${PROVIDER_LOWER}" = "minio" ] && [ -z "${BUCKET_DST_ENDPOINT}" ]; then
+if [ "${PROVIDER_DST_LOWER}" = "minio" ] && [ -z "${BUCKET_DST_ENDPOINT}" ]; then
   echo "You have to define the destination bucket endpoint"
   exit 12
 fi
@@ -34,7 +42,8 @@ echo "All the required inputs are present. Go on with the real job."
 
 echo "Copy the file from the source bucket to the destination bucket."
 format_string "Parameters:" "g"
-echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
+echo "$(format_string "Src Provider:" "bold") ${PROVIDER_SRC_LOWER}"
+echo "$(format_string "Dst Provider:" "bold") ${PROVIDER_DST_LOWER}"
 echo "$(format_string "Src:" "bold") ${BUCKET_SRC}/${FILE_SRC}"
 echo "$(format_string "Dst:" "bold") ${BUCKET_DST}/${FILE_DST}"
 if [ -z "${FILE_SRC}" ] && [ -z "${FILE_DST}" ]; then
@@ -46,15 +55,7 @@ elif [ -z "${FILE_DST}" ]; then
 fi
 echo "$(format_string "ACL:" "bold") ${ACL}"
 
-if [ "${PROVIDER_LOWER}" = "aws" ]; then
-  echo "rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}"
-  rclone_aws sync :s3://${BUCKET_SRC}/${FILE_SRC} :s3://${BUCKET_DST}/${FILE_DST}
-  EXIT_RCLONE=$?
-elif [ "${PROVIDER_LOWER}" = "gcs" ]; then
-  echo "rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST}"
-  rclone_gcs sync :gcs://${BUCKET_SRC}/${FILE_SRC} :gcs://${BUCKET_SRC}/${FILE_DST}
-  EXIT_RCLONE=$?
-elif [ "${PROVIDER_LOWER}" = "minio" ]; then
+if [ "${PROVIDER_LOWER}" = "minio" ]; then
   # Wait for source minio service
   WAIT_ENDPOINT=$(remove_http_proto "${BUCKET_SRC_ENDPOINT}")
   debug "Wait for source minio service (${WAIT_ENDPOINT}, timeout ${TIMEOUT_BUCKET_SRC} seconds)."
@@ -97,11 +98,11 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
       exit 13
     fi
   done
-
-  echo "rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}"
-  rclone_minio_multi sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}
-  EXIT_RCLONE=$?
 fi
+
+echo "rclone_generic sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}"
+rclone_generic sync src://${BUCKET_SRC}/${FILE_SRC} dst://${BUCKET_DST}/${FILE_DST}
+EXIT_RCLONE=$?
 
 if [ ${EXIT_RCLONE} -ne 0 ]; then
   echo "Something went wrong during the copy of files."

@@ -37,6 +37,38 @@ if [ -n "${ACL}" ]; then
   S3_ACL="--s3-acl ${ACL}"
 fi
 
+generate_rclone_conf() {
+  rm -f /tmp/rclone.conf
+  echo "[src]" | tee -a /tmp/rclone.conf
+  if [ "${PROVIDER_SRC_LOWER}" = "aws" ]; then
+    envsubst '${AWS_DEFAULT_REGION}' < ${BASE}/rclone.aws.conf | tee -a /tmp/rclone.conf
+  elif [ "${PROVIDER_SRC_LOWER}" = "gcs" ]; then
+    cat ${BASE}/rclone.gcs.conf | tee -a /tmp/rclone.conf
+  elif [ "${PROVIDER_SRC_LOWER}" = "minio" ]; then
+    BUCKET_ENDPOINT=${BUCKET_SRC_ENDPOINT} envsubst '${BUCKET_ENDPOINT}' < ${BASE}/rclone.minio.conf | tee -a /tmp/rclone.conf
+  fi
+
+  echo "" | tee -a /tmp/rclone.conf
+
+  echo "[dst]" | tee -a /tmp/rclone.conf
+  if [ "${PROVIDER_DST_LOWER}" = "aws" ]; then
+    envsubst '${AWS_DEFAULT_REGION}' < ${BASE}/rclone.aws.conf | tee -a /tmp/rclone.conf
+  elif [ "${PROVIDER_DST_LOWER}" = "gcs" ]; then
+    cat ${BASE}/rclone.gcs.conf | tee -a /tmp/rclone.conf
+  elif [ "${PROVIDER_DST_LOWER}" = "minio" ]; then
+    BUCKET_ENDPOINT=${BUCKET_DST_ENDPOINT} envsubst '${BUCKET_ENDPOINT}' < ${BASE}/rclone.minio.conf | tee -a /tmp/rclone.conf
+  fi
+  
+  echo "" | tee -a /tmp/rclone.conf
+}
+
+rclone_generic() {
+  generate_rclone_conf
+  echo "rclone --config=/tmp/rclone.conf ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
+  rclone --config=/tmp/rclone.conf \
+    ${S3_ACL} ${RCLONE_ADD_PARAMS} $@
+}
+
 rclone_aws() {
   echo "rclone --s3-region="${AWS_DEFAULT_REGION}" --s3-location-constraint="${AWS_DEFAULT_REGION}" --s3-env-auth ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
   rclone \
