@@ -21,7 +21,7 @@ ITEMS=$(aws s3api list-object-versions --bucket "${BUCKET}" --output json | jq '
 
 if [ -z "${ITEMS}" ]; then
   echo "There is no items to delete."
-  exit 13
+  exit 0
 fi
 
 echo "Delete objects."
