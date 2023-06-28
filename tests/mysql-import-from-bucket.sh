@@ -57,5 +57,4 @@ fi
 success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # End of Expectations
-
 envdestroy

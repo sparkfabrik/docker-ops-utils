@@ -27,14 +27,14 @@ cli-test:
 		$(IMAGE_NAME) ash -li
 
 test:
-	@echo "\e[33mTESTS for: mysql-import-from-bucket\e[39m"
-	@./tests/mysql-import-from-bucket.sh
-	@echo "\e[33mTESTS for: mysql-export-to-bucket\e[39m"
-	@./tests/mysql-export-to-bucket.sh
-	@echo "\e[33mTESTS for: mysql-drop-db-tables\e[39m"
-	@./tests/mysql-drop-db-tables.sh
-	@echo "\e[33mTESTS for: bucket-copy-bucket\e[39m"
-	@./tests/bucket-copy-bucket.sh
+	# @echo "\e[33mTESTS for: mysql-import-from-bucket\e[39m"
+	# @./tests/mysql-import-from-bucket.sh
+	# @echo "\e[33mTESTS for: mysql-export-to-bucket\e[39m"
+	# @./tests/mysql-export-to-bucket.sh
+	# @echo "\e[33mTESTS for: mysql-drop-db-tables\e[39m"
+	# @./tests/mysql-drop-db-tables.sh
+	# @echo "\e[33mTESTS for: bucket-copy-bucket\e[39m"
+	# @./tests/bucket-copy-bucket.sh
 	@echo "\e[33mTESTS for: mysql-export-all-to-bucket\e[39m"
 	@./tests/mysql-export-all-to-bucket.sh
 

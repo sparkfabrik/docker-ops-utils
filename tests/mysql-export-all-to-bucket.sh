@@ -12,6 +12,7 @@ mysqlimport
 mysql_export_all
 
 # # Expectations
+mysql_create_exp_database
 mysql_export_all_import_exported
 
 # Current DB is the re-imported
