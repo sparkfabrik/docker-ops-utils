@@ -22,6 +22,9 @@ export MYSQLDUMP_ADD_PARAMS=${MYSQLDUMP_ADD_PARAMS:-}
 export TIMEOUT_BUCKET=${TIMEOUT_BUCKET:-10}
 export TIMEOUT_MYSQL=${TIMEOUT_MYSQL:-30}
 
+export INCLUDE_SYSTEM_DATABASES=${INCLUDE_SYSTEM_DATABASES:-}
+export EXCLUDE_DATABASES=${EXCLUDE_DATABASES:-}
+
 show_usage() {
   cat <<EOM
 Usage: ${BASE_SCRIPT} ${TOPIC} [SUBCOMMAND] [OPTIONS]
@@ -30,6 +33,7 @@ SUBCOMMANDS
   help                                Print this help message
   import-from-bucket                  Import database from a bucket file
   export-to-bucket                    Export database (mysqldump) to a bucket
+  export-all-to-bucket                Export all databases (mysqldump) to a bucket
   drop-db-tables                      Drop all tables in the database
 
 OPTIONS
@@ -41,11 +45,13 @@ OPTIONS
   --provider                          Defines the bucket provider (aws, gcs, minio)
   --bucket-endpoint                   Defines the bucket endpoint
   --bucket                            Defines the bucket
-  --file                              Defines the file in the bucket (*.sql or *.sql.gz)
+  --file                              Defines the file in the bucket (*.sql or *.sql.gz), export-all-to-bucket command databse name is used as prefix
   --rclone-add-params                 Defines the additional parameters to be passed to rclone command
   --mysqldump-add-params              Defines the additional parameters to be passed to mysqldump command
   --timeout-bucket                    Defines the maximum waiting time for bucket set up (default ${TIMEOUT_BUCKET}s)
   --timeout-mysql                     Defines the maximum waiting time for mysql service (default ${TIMEOUT_MYSQL}s)
+  --include-system-databases          Defines if system databases should be included in export-all-to-bucket command (default false) 
+  --exclude                           Defines the databases (comma separated list) to be excluded in export-all-to-bucket command
 EOM
 }
 
@@ -70,6 +76,8 @@ EOM
   printf "%-${PAD}s %s\n" "MYSQLDUMP_ADD_PARAMS" "${MYSQLDUMP_ADD_PARAMS}"
   printf "%-${PAD}s %s\n" "TIMEOUT_BUCKET" "${TIMEOUT_BUCKET}"
   printf "%-${PAD}s %s\n" "TIMEOUT_MYSQL" "${TIMEOUT_MYSQL}"
+  printf "%-${PAD}s %s\n" "INCLUDE_SYSTEM_DATABASES" "${INCLUDE_SYSTEM_DATABASES}"
+  printf "%-${PAD}s %s\n" "EXCLUDE_DATABASES" "${EXCLUDE_DATABASES}"
 }
 
 # Process subcommand

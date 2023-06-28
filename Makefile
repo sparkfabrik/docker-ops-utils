@@ -35,6 +35,8 @@ test:
 	@./tests/mysql-drop-db-tables.sh
 	@echo "\e[33mTESTS for: bucket-copy-bucket\e[39m"
 	@./tests/bucket-copy-bucket.sh
+	@echo "\e[33mTESTS for: mysql-export-all-to-bucket\e[39m"
+	@./tests/mysql-export-all-to-bucket.sh
 
 mysql-test-up:
 	@echo "\e[33mThis make target will reboot the test mysql service.\e[39m"
