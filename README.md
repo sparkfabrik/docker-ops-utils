@@ -98,7 +98,7 @@ docker run --rm ops-utils:latest mysql export-to-bucket
 
 This command exports all databases to a bucket.
 
-All database are exported in single file, with the name of the database as path (without the `-db` suffix) plus the --file name.
+All databases are exported as a single file, using the name of the database as path (removing the `-db` suffix) and the `--file` parameter value as file name.
 
 ```bash
 
