@@ -15,7 +15,7 @@ copyfrombucket basebucket
 
 # There is 2 object in root (count)
 TEST_STR="There is 2 object in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/ | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/ | wc -l | tr -d ' ')
 EXPECTED="2"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -24,7 +24,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # image1.png is present in root (count)
 TEST_STR="image1.png is present in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/image1.png | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/image1.png | wc -l | tr -d ' ')
 EXPECTED="1"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -42,7 +42,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # image1.jpg is present in root (count)
 TEST_STR="image1.jpg is present in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/image1.jpg | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/image1.jpg | wc -l | tr -d ' ')
 EXPECTED="1"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -72,7 +72,7 @@ copytobucket entirebucket/seeds
 
 # There is 2 object in root (count)
 TEST_STR="There is 2 object in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/ | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/ | wc -l | tr -d ' ')
 EXPECTED="2"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -81,7 +81,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # dump.sql.gz is present in root (count)
 TEST_STR="dump.sql.gz is present in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/dump.sql.gz | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/dump.sql.gz | wc -l | tr -d ' ')
 EXPECTED="1"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -99,7 +99,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # entirebucket folder is present in root (count)
 TEST_STR="entirebucket folder is present in root (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket | wc -l | tr -d ' ')
 EXPECTED="1"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -117,7 +117,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # entirebucket folder contains only seeds subfolder (count)
 TEST_STR="entirebucket folder contains only seeds subfolder (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket/ | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket/ | wc -l | tr -d ' ')
 EXPECTED="1"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
@@ -135,7 +135,7 @@ success "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
 
 # seeds subfolder contains correct files (count)
 TEST_STR="seeds subfolder contains correct files (count)"
-ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket/seeds/ | wc -l)
+ACTUAL=$(bucketlsf "http://minio-dst:9000" dstbucket/entirebucket/seeds/ | wc -l | tr -d ' ')
 EXPECTED="3"
 if [ "${ACTUAL}" != "${EXPECTED}" ]; then
   fail "${TEST_STR}" "${ACTUAL}" "${EXPECTED}"
