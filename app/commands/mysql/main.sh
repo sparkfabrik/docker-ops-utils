@@ -45,7 +45,7 @@ OPTIONS
   --provider                          Defines the bucket provider (aws, gcs, minio)
   --bucket-endpoint                   Defines the bucket endpoint
   --bucket                            Defines the bucket
-  --file                              Defines the file in the bucket (*.sql or *.sql.gz), export-all-to-bucket command databse name is used as prefix
+  --file                              Defines the file in the bucket (*.sql or *.sql.gz)
   --rclone-add-params                 Defines the additional parameters to be passed to rclone command
   --mysqldump-add-params              Defines the additional parameters to be passed to mysqldump command
   --timeout-bucket                    Defines the maximum waiting time for bucket set up (default ${TIMEOUT_BUCKET}s)

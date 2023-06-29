@@ -49,17 +49,6 @@ if [ -z "${FILE}" ]; then
   exit 12
 fi
 
-# All the required inputs are present! Do the job
-echo "All the required inputs are present. Go on with the real job."
-
-echo "Export all MySQL databases dump to bucket."
-format_string "Parameters:" "g"
-echo "$(format_string "Host:" "bold") ${DB_HOST}"
-echo "$(format_string "Port:" "bold") ${DB_PORT}"
-echo "$(format_string "User:" "bold") ${DB_USER}"
-echo "$(format_string "Database:" "bold") ${DB_NAME}"
-echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
-
 EXCLUDE=${MYSQL_SYSTEM_DEFAULT_DATABASES}
 
 # Check if we have to include system databases
@@ -75,17 +64,28 @@ if [ -n "${EXCLUDE_DATABASES}" ]; then
     EXCLUDE=${EXCLUDE_DATABASES}
   fi
 fi
-EXCLUDE=(`echo $EXCLUDE | tr ',' ' '`)
+EXCLUDE=$(echo $EXCLUDE | tr ',' ' ')
+
+# All the required inputs are present! Do the job
+echo "All the required inputs are present. Go on with the real job."
+
+echo "Export all MySQL databases dump to bucket."
+format_string "Parameters:" "g"
+echo "$(format_string "Host:" "bold") ${DB_HOST}"
+echo "$(format_string "Port:" "bold") ${DB_PORT}"
+echo "$(format_string "User:" "bold") ${DB_USER}"
+echo "$(format_string "Database:" "bold") ${DB_NAME}"
+echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
+echo "$(format_string "Include system databases:" "bold") ${INCLUDE_SYSTEM_DATABASES}"
+echo "$(format_string "Exclude databases:" "bold") ${EXCLUDE}"
 
 echo "Get all databases from ${DB_HOST}."
 databases=$(mysql -h "${DB_HOST}" -u "${DB_USER}" --password="${DB_PASSWORD}" -e "SELECT schema_name FROM information_schema.schemata;")
 debug "mysql -h \"${DB_HOST}\" -u \${DB_USER}\" --password=\"${DB_PASSWORD}\" -e \"SELECT schema_name FROM information_schema.schemata;\""
-databases=(`echo $databases | tr '\n' ' '`)
+databases=$(echo $databases | tr '\n' ' ')
 
-EXPORTED_DATABASES=""
-
-for db in "${databases[@]}"; do
-  if [[ " ${EXCLUDE[@]} " =~ " ${db} " ]]; then
+for db in ${databases}; do
+  if [[ " ${EXCLUDE} " =~ " ${db} " ]]; then
     debug "Database ${db} is in the exclude list. Skip it."
   else
     echo "Dump database ${db}."
