@@ -1,9 +1,13 @@
 ARG AWS_CLI_VERSION=2.12.0
 ARG ALPINE_VERSION=3.18
+ARG AUTHOR=sparkfabrik
+ARG IMAGE_NAME=ops-utils
 
 FROM ghcr.io/sparkfabrik/docker-alpine-aws-cli:${AWS_CLI_VERSION}-alpine${ALPINE_VERSION} as awscli
 
 FROM alpine:${ALPINE_VERSION}
+
+LABEL org.opencontainers.image.source https://github.com/${AUTHOR}/${IMAGE_NAME}
 
 RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl
 
