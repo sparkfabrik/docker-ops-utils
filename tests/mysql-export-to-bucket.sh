@@ -8,6 +8,7 @@ export BASE=$(dirname $0)
 
 envprepare
 mysqlimport
+mysql_create_exp_database
 mysqlimport_exported_db
 
 # Expectations
