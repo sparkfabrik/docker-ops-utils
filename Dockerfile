@@ -1,4 +1,10 @@
-FROM alpine:3.13
+ARG ALPINE_VERSION=3.18
+ARG AUTHOR=sparkfabrik
+ARG IMAGE_NAME=ops-utils
+
+FROM alpine:${ALPINE_VERSION}
+LABEL org.opencontainers.image.source https://github.com/${AUTHOR}/${IMAGE_NAME}
+
 RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl aws-cli
 RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /usr/local/bin/wait-for-it
