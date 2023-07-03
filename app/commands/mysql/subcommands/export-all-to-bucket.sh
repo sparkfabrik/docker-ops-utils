@@ -93,10 +93,6 @@ for db in ${databases}; do
     # Remove `-db` from the database name, it is a Drupal chart naming convention
     folder=$(echo "$db" | sed 's/-db$//')
     export FILE="${folder}/${CURRENT_FILE}"
-
-    echo "Remove the previously created file '${FILE}' if exists."
-    rm -f "${FILE}"
-
     debug "sh ${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
     (exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh")
     RET_SUBSHELL=$?

@@ -94,6 +94,9 @@ else
 fi
 
 if [ ${NEED_COMPRESSION} -eq 1 ]; then
+  echo "Remove the previously created file if exists (${DST_DIR}/${LOCAL_FILE})."
+  rm -f "${DST_DIR}/${LOCAL_FILE}"
+
   echo "Compress the dump (${DST_DIR}/${LOCAL_FILE})."
   gzip "${DST_DIR}/${LOCAL_DUMP_FILE}"
   GZIP_EXIT=$?
