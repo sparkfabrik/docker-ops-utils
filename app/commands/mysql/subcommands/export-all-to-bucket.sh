@@ -55,7 +55,7 @@ fi
 # Add database to exclude
 if [ -n "${EXCLUDE_DATABASES}" ]; then
   if [ -n "${EXCLUDE}" ]; then
-    EXCLUDE="${EXCLUDE},${EXCLUDE_DATABASES}"    
+    EXCLUDE="${EXCLUDE},${EXCLUDE_DATABASES}"
   else
     EXCLUDE=${EXCLUDE_DATABASES}
   fi
@@ -93,13 +93,17 @@ for db in ${databases}; do
     # Remove `-db` from the database name, it is a Drupal chart naming convention
     folder=$(echo "$db" | sed 's/-db$//')
     export FILE="${folder}/${CURRENT_FILE}"
+
+    echo "Remove the previously created file '${FILE}' if exists."
+    rm -f "${FILE}"
+
     debug "sh ${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
     (exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh")
     RET_SUBSHELL=$?
     if [ "${RET_SUBSHELL}" != "0" ]; then
       GLOBAL_EXIT=1
       echo "The exec command fails (${RET_SUBSHELL}). Database ${db}"
-      FAILED_DATABASES="${FAILED_DATABASES}${db},"      
+      FAILED_DATABASES="${FAILED_DATABASES}${db},"
     fi
   fi
 done
@@ -107,5 +111,5 @@ done
 if [ -n "${FAILED_DATABASES}" ]; then
   echo "The failed databases are: ${FAILED_DATABASES}"
 fi
-  
+
 exit ${GLOBAL_EXIT}

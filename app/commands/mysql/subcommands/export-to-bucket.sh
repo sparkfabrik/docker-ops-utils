@@ -96,11 +96,16 @@ fi
 if [ ${NEED_COMPRESSION} -eq 1 ]; then
   echo "Compress the dump (${DST_DIR}/${LOCAL_FILE})."
   gzip "${DST_DIR}/${LOCAL_DUMP_FILE}"
+  GZIP_EXIT=$?
+  if [ "${GZIP_EXIT}" -ne 0 ]; then
+    echo "ERROR: the dump was not compressed."
+    exit 14
+  fi
 fi
 
 if [ ! -s "${DST_DIR}/${LOCAL_FILE}" ] || [ ! -r "${DST_DIR}/${LOCAL_FILE}" ]; then
   echo "ERROR: the file was not created."
-  exit 14
+  exit 15
 fi
 
 debug "Upload the file ${LOCAL_FILE} to the bucket (provider: ${PROVIDER_LOWER})."
