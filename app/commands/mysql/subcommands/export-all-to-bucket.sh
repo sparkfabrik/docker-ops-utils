@@ -20,10 +20,6 @@ if [ -z "${DB_PASSWORD}" ]; then
   echo "You have to define the db password"
   exit 12
 fi
-if [ -z "${DB_NAME}" ]; then
-  echo "You have to define the db name"
-  exit 12
-fi
 if [ -z "${DB_PORT}" ]; then
   echo "You have to define the db port"
   exit 12
