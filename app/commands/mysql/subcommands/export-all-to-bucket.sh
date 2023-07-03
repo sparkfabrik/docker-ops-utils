@@ -70,7 +70,6 @@ format_string "Parameters:" "g"
 echo "$(format_string "Host:" "bold") ${DB_HOST}"
 echo "$(format_string "Port:" "bold") ${DB_PORT}"
 echo "$(format_string "User:" "bold") ${DB_USER}"
-echo "$(format_string "Database:" "bold") ${DB_NAME}"
 echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
 echo "$(format_string "Include system databases:" "bold") ${INCLUDE_SYSTEM_DATABASES}"
 echo "$(format_string "Exclude databases:" "bold") ${EXCLUDE}"
@@ -85,6 +84,7 @@ for db in ${databases}; do
     debug "Database ${db} is in the exclude list. Skip it."
   else
     echo "Dump database ${db}."
+    export DB_NAME="${db}"
     # Remove `-db` from the database name, it is a Drupal chart naming convention
     folder=$(echo "$db" | sed 's/-db$//')
     export FILE="${folder}/${FILE}"
