@@ -79,6 +79,9 @@ databases=$(mysql -h "${DB_HOST}" -u "${DB_USER}" --password="${DB_PASSWORD}" -e
 debug "mysql -h \"${DB_HOST}\" -u \${DB_USER}\" --password=\"${DB_PASSWORD}\" -e \"SELECT schema_name FROM information_schema.schemata;\""
 databases=$(echo $databases | tr '\n' ' ')
 
+FAILED_DATABASES=""
+GLOBAL_EXIT=0
+
 for db in ${databases}; do
   if [[ " ${EXCLUDE} " =~ " ${db} " ]]; then
     debug "Database ${db} is in the exclude list. Skip it."
@@ -89,6 +92,18 @@ for db in ${databases}; do
     folder=$(echo "$db" | sed 's/-db$//')
     export FILE="${folder}/${FILE}"
     debug "sh ${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
-    exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
+    (exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh")
+    RET_SUBSHELL=$?
+    if [ "${RET_SUBSHELL}" != "0" ]: then
+      GLOBAL_EXIT=1
+      echo "The exec command fails (${RET_SUBSHELL}). Database ${db}"
+      FAILED_DATABASES="${FAILED_DATABASES}${db},"      
+    fi
   fi
 done
+
+if [ -n "${FAILED_DATABASES}" ]: then
+  echo "The failed databases are: ${FAILED_DATABASES}"
+fi
+  
+exit ${GLOBAL_EXIT}
