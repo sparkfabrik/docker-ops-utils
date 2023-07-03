@@ -1,5 +1,18 @@
-FROM alpine:3.13
-RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl aws-cli
+ARG AUTHOR=sparkfabrik
+ARG IMAGE_NAME=ops-utils
+ARG ALPINE_VERSION=3.18
+ARG AWS_CLI_VERSION=2.12.0
+
+FROM ghcr.io/sparkfabrik/docker-alpine-aws-cli:${AWS_CLI_VERSION}-alpine${ALPINE_VERSION} as awscli
+
+FROM alpine:${ALPINE_VERSION}
+LABEL org.opencontainers.image.source https://github.com/${AUTHOR}/${IMAGE_NAME}
+
+RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl
+
+# Install AWS CLI v2 using the binary builded in the awscli stage
+COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
+RUN ln -s /usr/local/aws-cli/v2/current/bin/aws /usr/local/bin/aws
 
 RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /usr/local/bin/wait-for-it
