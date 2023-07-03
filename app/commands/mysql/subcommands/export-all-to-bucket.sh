@@ -102,7 +102,7 @@ for db in ${databases}; do
   fi
 done
 
-if [ -n "${FAILED_DATABASES}" ]: then
+if [ -n "${FAILED_DATABASES}" ]; then
   echo "The failed databases are: ${FAILED_DATABASES}"
 fi
   
