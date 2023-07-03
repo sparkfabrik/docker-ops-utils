@@ -81,6 +81,8 @@ databases=$(echo $databases | tr '\n' ' ')
 
 FAILED_DATABASES=""
 GLOBAL_EXIT=0
+# We need to store this variable to avoid overwriting.
+CURRENT_FILE=${FILE}
 
 for db in ${databases}; do
   if [[ " ${EXCLUDE} " =~ " ${db} " ]]; then
@@ -90,7 +92,7 @@ for db in ${databases}; do
     export DB_NAME="${db}"
     # Remove `-db` from the database name, it is a Drupal chart naming convention
     folder=$(echo "$db" | sed 's/-db$//')
-    export FILE="${folder}/${FILE}"
+    export FILE="${folder}/${CURRENT_FILE}"
     debug "sh ${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
     (exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh")
     RET_SUBSHELL=$?
