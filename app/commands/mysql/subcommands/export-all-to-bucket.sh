@@ -94,7 +94,7 @@ for db in ${databases}; do
     debug "sh ${BASE}/commands/mysql/subcommands/export-to-bucket.sh"
     (exec "sh" "${BASE}/commands/mysql/subcommands/export-to-bucket.sh")
     RET_SUBSHELL=$?
-    if [ "${RET_SUBSHELL}" != "0" ]: then
+    if [ "${RET_SUBSHELL}" != "0" ]; then
       GLOBAL_EXIT=1
       echo "The exec command fails (${RET_SUBSHELL}). Database ${db}"
       FAILED_DATABASES="${FAILED_DATABASES}${db},"      
