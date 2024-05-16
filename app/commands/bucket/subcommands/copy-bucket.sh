@@ -32,6 +32,11 @@ fi
 # All the required inputs are present! Do the job
 echo "All the required inputs are present. Go on with the real job."
 
+if [ "${FILE_DST}" = "." ] || [ "${FILE_DST}" = "./" ]; then
+  echo "The destination file is the bucket root, empty the variable."
+  FILE_DST=""
+fi
+
 echo "Copy the file from the source bucket to the destination bucket."
 format_string "Parameters:" "g"
 echo "$(format_string "Provider:" "bold") ${PROVIDER_LOWER}"
@@ -78,18 +83,18 @@ elif [ "${PROVIDER_LOWER}" = "minio" ]; then
     echo "ERROR: Wait for minio service fails."
     exit ${EXIT_WAIT}
   fi
-  
+
   # Wait until the file is present in the bucket
   LOOP_CNT=0
   EXIT_LS=3
 
   debug "Wait for source minio service files (timeout ${TIMEOUT_BUCKET_SRC} seconds)."
   while [ ${EXIT_LS} -ne 0 ]; do
-    rclone_minio_multi ls src://${BUCKET_SRC}/${FILE_SRC} 1> /dev/null
+    rclone_minio_multi ls src://${BUCKET_SRC}/${FILE_SRC} 1>/dev/null
     EXIT_LS=$?
 
     debug "Check for loop ${LOOP_CNT} fail"
-    LOOP_CNT=$(($LOOP_CNT+1))
+    LOOP_CNT=$(($LOOP_CNT + 1))
     sleep 1
 
     if [ ${LOOP_CNT} -ge ${TIMEOUT_BUCKET_SRC} ]; then

@@ -19,13 +19,19 @@ format_string() {
   if [ -n "${1:-}" ]; then
     END="\e[39m"
     case "${2}" in
-      g|gree) PRE="\e[32m" ;;
-      y|yellow) PRE="\e[33m" ;;
-      r|red) PRE="\e[31m" ;;
-      bold) PRE="\e[1m"; END="\e[0m"; ;;
-      italic) PRE="\e[3m" END="\e[0m"; ;;
-      underlined) PRE="\e[4m" END="\e[0m"; ;;
-      *) PRE=""; END=""; ;;
+    g | gree) PRE="\e[32m" ;;
+    y | yellow) PRE="\e[33m" ;;
+    r | red) PRE="\e[31m" ;;
+    bold)
+      PRE="\e[1m"
+      END="\e[0m"
+      ;;
+    italic) PRE="\e[3m" END="\e[0m" ;;
+    underlined) PRE="\e[4m" END="\e[0m" ;;
+    *)
+      PRE=""
+      END=""
+      ;;
     esac
 
     echo -e "${PRE}${1}${END}"
@@ -63,7 +69,8 @@ rclone_minio() {
 
 rclone_minio_multi() {
   echo "rclone --config=/tmp/rclone.conf ${S3_ACL} ${RCLONE_ADD_PARAMS} $@"
-  envsubst < ${BASE}/rclone.conf > /tmp/rclone.conf
+  PROVIDER="Minio"
+  envsubst <${BASE}/rclone.conf >/tmp/rclone.conf
   rclone --config=/tmp/rclone.conf \
     ${S3_ACL} ${RCLONE_ADD_PARAMS} $@
 }
