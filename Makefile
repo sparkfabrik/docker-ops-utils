@@ -9,7 +9,10 @@ build:
 cli: build
 	@touch .env
 	docker run --rm -it \
+		--hostname ops-utils \
 		--env-file .env \
+		-v ${PWD}/app:/app \
+		-w /app \
 		$(IMAGE_NAME):$(IMAGE_TAG) ash -li
 
 cli-dev: build

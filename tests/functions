@@ -40,13 +40,13 @@ mysqlimport() {
 
 mysql_export_all() {
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
-    mysql export-all-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds  --file dump.sql.gz
+    mysql export-all-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
 }
 
 mysql_create_exp_database() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'" CREATE DATABASE ${DB_NAME_EXP}"'"'
 }
 
@@ -59,7 +59,7 @@ mysql_export_all_import_exported() {
 
 mysqlimport_exported_db() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
-  
+
   docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     mysql export-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
   docker-compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
@@ -77,7 +77,7 @@ query() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'"${1}"'"' | tr -d "\r"
 }
 
@@ -87,7 +87,7 @@ query_exported_db() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME_EXP}" -e "'"${1}"'"' | tr -d "\r"
 }
 
@@ -143,7 +143,7 @@ bucketlsf() {
   ENDPOINT="${1}"
   FILE="${2}"
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lic \
+  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'rclone --s3-provider=Minio --s3-env-auth --s3-endpoint="'"${ENDPOINT}"'" lsf :s3:"'"${FILE}"'" 2>/dev/null' | tr -d "\r"
 }
 

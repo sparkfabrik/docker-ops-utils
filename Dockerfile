@@ -1,4 +1,5 @@
-FROM alpine:3.13
+FROM alpine:3.19
+
 RUN apk add --no-cache file gettext jq rclone mysql-client mariadb-connector-c postgresql-client bash curl aws-cli
 
 RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
