@@ -20,6 +20,7 @@ cli-dev: build
 	docker run --rm -it \
 		--env-file .env \
 		-v ${PWD}/app:/app \
+		-v ${HOME}/.config/gcloud:/root/.config/gcloud \
 		-w /app \
 		$(IMAGE_NAME):$(IMAGE_TAG) ash -li
 
