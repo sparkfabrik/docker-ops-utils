@@ -170,7 +170,7 @@ if [ "${DB_DUMP_SANITIZE}" -eq 1 ]; then
   sanitizeDbSeed "${DUMP_FILE}"
 fi
 
-echo "Exec mysql import."
+echo "Exec mariadb import."
 mariadb -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" ${DB_EXTRA_ARGS} < "${DUMP_FILE}"
 EXIT_CMD=$?
 
