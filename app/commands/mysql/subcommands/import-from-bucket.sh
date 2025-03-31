@@ -48,12 +48,12 @@ if [ -z "${FILE}" ]; then
   exit 12
 fi
 
-if [[ -z "${DB_EXTRA_ARGS:-}" ]]; then
+if [ -z "${DB_EXTRA_ARGS:-}" ]; then
   echo "DB_EXTRA_ARGS not set. Defaulting to --skip-ssl"
   DB_EXTRA_ARGS="--skip-ssl"
 fi
 
-if [[ -z "${DB_DUMP_SANITIZE:-}" ]]; then
+if [ -z "${DB_DUMP_SANITIZE:-}" ]; then
   echo "DB_DUMP_SANITIZE not set. Defaulting to 1"
   DB_DUMP_SANITIZE=1
 fi
