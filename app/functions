@@ -78,3 +78,13 @@ rclone_minio_multi() {
 remove_http_proto() {
   echo "${1}" | sed 's|http[s]*://||g'
 }
+
+# Sanitize the sql dump from unwanted entries like USE or CREATE DATABASE.
+function sanitizeDbSeed() {
+  local file="${1:-$DUMP_FILE}"
+  echo "Sanitizing ${file}"
+  # Remove all lines starting with 'CREATE DATABASE' or 'USE'
+  sed -i '/^USE.*;$/d' "${file}"
+  sed -i '/^CREATE DATABASE.*;$/d' "${file}"
+  sed -i '1{/^\/\*!999999\\- enable the sandbox mode \*\//d}' "${file}"
+}
