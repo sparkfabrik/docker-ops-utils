@@ -83,8 +83,13 @@ remove_http_proto() {
 function sanitizeDbSeed() {
   local file="${1:-$DUMP_FILE}"
   echo "Sanitizing ${file}"
+  if [ ! -f "${file}" ]; then
+    echo "ERROR: File ${file} does not exist or is not accessible."
+    return 1
+  fi
   # Remove all lines starting with 'CREATE DATABASE' or 'USE'
   sed -i '/^USE.*;$/d' "${file}"
   sed -i '/^CREATE DATABASE.*;$/d' "${file}"
   sed -i '1{/^\/\*!999999\\- enable the sandbox mode \*\//d}' "${file}"
+  return 0;
 }

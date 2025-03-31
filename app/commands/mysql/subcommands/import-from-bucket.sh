@@ -168,6 +168,11 @@ fi
 if [ "${DB_DUMP_SANITIZE}" -eq 1 ]; then
   echo "Sanitizing the database dump file."
   sanitizeDbSeed "${DUMP_FILE}"
+  EXIT_SANITIZE=$?
+  if [ ${EXIT_SANITIZE} -ne 0 ]; then
+    echo "ERROR: Database sanitization failed."
+    exit ${EXIT_SANITIZE}
+  fi
 fi
 
 echo "Exec mariadb import."
