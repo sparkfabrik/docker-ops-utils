@@ -23,51 +23,51 @@ getenvvar() {
 }
 
 envdestroy() {
-  docker-compose -f "${COMPOSE_FILE}" down -v
+  docker compose -f "${COMPOSE_FILE}" down -v
 }
 
 envprepare() {
   envdestroy
 
-  docker-compose -f "${COMPOSE_FILE}" build --pull
-  docker-compose -f "${COMPOSE_FILE}" up -d
+  docker compose -f "${COMPOSE_FILE}" build --pull
+  docker compose -f "${COMPOSE_FILE}" up -d
 }
 
 mysqlimport() {
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
 }
 
 mysql_export_all() {
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     mysql export-all-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file dump.sql.gz
 }
 
 mysql_create_exp_database() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
+  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'" CREATE DATABASE ${DB_NAME_EXP}"'"'
 }
 
 mysql_export_all_import_exported() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
     mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file ${DB_NAME}/dump.sql.gz
 }
 
 mysqlimport_exported_db() {
   DB_NAME_EXP=$(getenvvar DB_NAME_EXP)
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     mysql export-to-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
-  docker-compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm -e DB_NAME=${DB_NAME_EXP} ops-utils \
     mysql import-from-bucket --provider minio --bucket-endpoint "http://minio:9000" --bucket seeds --file exported/dump-exported.sql.gz
 }
 
 mysqldroptables() {
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     mysql drop-db-tables
 }
 
@@ -77,7 +77,7 @@ query() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
+  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME}" -e "'"${1}"'"' | tr -d "\r"
 }
 
@@ -87,7 +87,7 @@ query_exported_db() {
     exit 99
   fi
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
+  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'mysql --skip-column-names --silent --raw -h "${DB_HOST}" -u ${DB_USER} --password=${DB_PASSWORD} --database="${DB_NAME_EXP}" -e "'"${1}"'"' | tr -d "\r"
 }
 
@@ -100,7 +100,7 @@ copyfiles() {
   FILE_SRC="${1}"
   FILE_DST="${2}"
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
@@ -114,7 +114,7 @@ copytobucket() {
 
   FILE_DST="${1}"
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket --file-dst "${FILE_DST}"
@@ -128,7 +128,7 @@ copyfrombucket() {
 
   FILE_SRC="${1}"
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm ops-utils \
+  docker compose -f "${COMPOSE_FILE}" run --rm ops-utils \
     bucket copy-bucket --provider minio --acl public-read \
     --bucket-src-endpoint "http://minio:9000" --bucket-src seeds --file-src "${FILE_SRC}" \
     --bucket-dst-endpoint "http://minio-dst:9000" --bucket-dst dstbucket
@@ -143,7 +143,7 @@ bucketlsf() {
   ENDPOINT="${1}"
   FILE="${2}"
 
-  docker-compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
+  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint ash ops-utils -lc \
     'rclone --s3-provider=Minio --s3-env-auth --s3-endpoint="'"${ENDPOINT}"'" lsf :s3:"'"${FILE}"'" 2>/dev/null' | tr -d "\r"
 }
 

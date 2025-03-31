@@ -48,6 +48,16 @@ if [ -z "${FILE}" ]; then
   exit 12
 fi
 
+if [ -z "${DB_EXTRA_ARGS:-}" ]; then
+  echo "DB_EXTRA_ARGS not set. Defaulting to --skip-ssl"
+  DB_EXTRA_ARGS="--skip-ssl"
+fi
+
+if [ -z "${DB_DUMP_SANITIZE:-}" ]; then
+  echo "DB_DUMP_SANITIZE not set. Defaulting to 1"
+  DB_DUMP_SANITIZE=1
+fi
+
 # All the required inputs are present! Do the job
 echo "All the required inputs are present. Go on with the real job."
 
@@ -154,8 +164,19 @@ if [ ${EXIT_WAIT} -ne 0 ]; then
   exit ${EXIT_WAIT}
 fi
 
-echo "Exec mysql import."
-mysql -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" < "${DUMP_FILE}"
+# Prepare the database.
+if [ "${DB_DUMP_SANITIZE}" -eq 1 ]; then
+  echo "Sanitizing the database dump file."
+  sanitizeDbSeed "${DUMP_FILE}"
+  EXIT_SANITIZE=$?
+  if [ ${EXIT_SANITIZE} -ne 0 ]; then
+    echo "ERROR: Database sanitization failed."
+    exit ${EXIT_SANITIZE}
+  fi
+fi
+
+echo "Exec mariadb import."
+mariadb -h "${DB_HOST}" -P ${DB_PORT} -u "${DB_USER}" --password="${DB_PASSWORD}" "${DB_NAME}" ${DB_EXTRA_ARGS} < "${DUMP_FILE}"
 EXIT_CMD=$?
 
 if [ ${EXIT_CMD} -ne 0 ]; then
