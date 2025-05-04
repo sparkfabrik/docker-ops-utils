@@ -7,7 +7,10 @@ SCRIPT=$(basename $0)
 export SUBCOMMAND=""
 
 export PROVIDER=${PROVIDER:-}
-export PROVIDER_LOWER=
+export PROVIDER_SRC=${PROVIDER_SRC:-}
+export PROVIDER_SRC_LOWER=
+export PROVIDER_DST=${PROVIDER_DST:-}
+export PROVIDER_DST_LOWER=
 export BUCKET_SRC_ENDPOINT=${BUCKET_SRC_ENDPOINT:-}
 export BUCKET_SRC=${BUCKET_SRC:-}
 export FILE_SRC=${FILE_SRC:-""}
@@ -78,7 +81,9 @@ shift
 PARAMS=""
 while [ -n "${1:-}" ]; do
   case "${1}" in
-    --provider) PROVIDER="${2}"; shift 2 ;;
+    --provider) PROVIDER_SRC="${2}"; PROVIDER_DST="${2}"; shift 2 ;;
+    --provider-src) PROVIDER_SRC="${2}"; shift 2 ;;
+    --provider-dst) PROVIDER_DST="${2}"; shift 2 ;;
     --bucket-src-endpoint) BUCKET_SRC_ENDPOINT="${2}"; shift 2 ;;
     --bucket-src) BUCKET_SRC="${2}"; shift 2 ;;
     --file-src) FILE_SRC="${2}"; shift 2 ;;
@@ -96,7 +101,8 @@ done
 
 eval set -- "$PARAMS"
 
-PROVIDER_LOWER=$(echo ${PROVIDER} | awk '{print tolower($0)}')
+PROVIDER_SRC_LOWER=$(echo ${PROVIDER_SRC} | awk '{print tolower($0)}')
+PROVIDER_DST_LOWER=$(echo ${PROVIDER_DST} | awk '{print tolower($0)}')
 
 # Check dry run execution
 if [ ${DRY_RUN} -eq 1 ]; then
