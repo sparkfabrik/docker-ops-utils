@@ -37,11 +37,6 @@ fi
 ITEMS_TOT_COUNT=$(jq 'length' <"${ITEMS_TEMP_FILE}")
 echo There are "$(format_string "${ITEMS_TOT_COUNT}" "bold")" items in the bucket.
 
-if [ ${ITEMS_TOT_COUNT} -eq 0 ]; then
-  echo "Bucket is already empty, bailing out."
-  exit 0
-fi
-
 EXIT_CMD=0
 I=0
 until ((I * PAGE_SIZE > ITEMS_TOT_COUNT)); do
