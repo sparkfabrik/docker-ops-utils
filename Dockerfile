@@ -1,4 +1,4 @@
-FROM ghcr.io/sparkfabrik/docker-alpine-aws-cli:2.25.6-alpine3.20 as awscli
+FROM ghcr.io/sparkfabrik/docker-alpine-aws-cli:2.31.17-alpine3.20 AS awscli
 
 FROM alpine:3.20
 
